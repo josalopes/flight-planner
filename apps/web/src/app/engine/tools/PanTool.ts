@@ -1,0 +1,35 @@
+// tools/PanTool.ts
+
+import { CanvasEngine } from "../CanvasEngine"
+import { Tool } from "../types/Tool"
+
+export class PanTool implements Tool{
+  id = "pan"
+  cursor = "grab"
+
+  private isDragging = false
+  private lastPos = { x: 0, y: 0 }
+
+  onMouseDown(engine: CanvasEngine, e: MouseEvent) {
+    this.isDragging = true
+    this.lastPos = { x: e.clientX, y: e.clientY }
+  }
+
+  onMouseMove(engine: CanvasEngine, e: MouseEvent) {
+    if (!this.isDragging) return
+
+    const dx = e.clientX - this.lastPos.x
+    const dy = e.clientY - this.lastPos.y
+
+    engine.offset.x += dx
+    engine.offset.y += dy
+
+    this.lastPos = { x: e.clientX, y: e.clientY }
+
+    engine.render()
+  }
+
+  onMouseUp() {
+    this.isDragging = false
+  }
+}
