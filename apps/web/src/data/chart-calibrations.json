@@ -1,0 +1,462 @@
+{
+  "principe-da-beira_wac_20250710.pdf": {
+    "topLeft": {
+      "x": 23.72,
+      "y": 4.09
+    },
+    "bottomRight": {
+      "x": 122.55,
+      "y": 72.29
+    }
+  },
+  "natal_wac_20241128.pdf": {
+    "topLeft": {
+      "x": 20.65,
+      "y": 3.03
+    },
+    "bottomRight": {
+      "x": 124.34,
+      "y": 71.83
+    }
+  },
+  "humaita_wac_20251127.pdf": {
+    "topLeft": {
+      "x": 19.49,
+      "y": 6.57
+    },
+    "bottomRight": {
+      "x": 111.27,
+      "y": 69.72
+    }
+  },
+  "tumucumaque_wac_20241226.pdf": {
+    "topLeft": {
+      "x": 20.97,
+      "y": 3.65
+    },
+    "bottomRight": {
+      "x": 123.19,
+      "y": 72.5
+    }
+  },
+  "pico-da-neblina_wac_20251225.pdf": {
+    "topLeft": {
+      "x": 21.76,
+      "y": 0.31
+    },
+    "bottomRight": {
+      "x": 124.32,
+      "y": 71.73
+    }
+  },
+  "tabatinga_wac_20251225.pdf": {
+    "topLeft": {
+      "x": 19.41,
+      "y": 5.28
+    },
+    "bottomRight": {
+      "x": 121.62,
+      "y": 74.38
+    }
+  },
+  "boa-vista_wac_20241226.pdf": {
+    "topLeft": {
+      "x": 20.71,
+      "y": 2.87
+    },
+    "bottomRight": {
+      "x": 123.87,
+      "y": 72.12
+    }
+  },
+  "monte-roraima_wac_20250807.pdf": {
+    "topLeft": {
+      "x": 21.61,
+      "y": 2.61
+    },
+    "bottomRight": {
+      "x": 124.58,
+      "y": 72.76
+    }
+  },
+  "brasilia---em-vigor-em-25-jan-24-_wac_20240125.pdf": {
+    "topLeft": {
+      "x": 22.77,
+      "y": 3.82
+    },
+    "bottomRight": {
+      "x": 123.09,
+      "y": 72.82
+    }
+  },
+  "rio-de-janeiro_wac_20251030.pdf": {
+    "topLeft": {
+      "x": 26.52,
+      "y": 1.82
+    },
+    "bottomRight": {
+      "x": 123.24,
+      "y": 73.13
+    }
+  },
+  "itaituba---em-vigor-25-jan-24_wac_20240125.pdf": {
+    "topLeft": {
+      "x": 20.47,
+      "y": 4.04
+    },
+    "bottomRight": {
+      "x": 122.78,
+      "y": 73.11
+    }
+  },
+  "porto-nacional_wac_20240516.pdf": {
+    "topLeft": {
+      "x": 19.62,
+      "y": 2.06
+    },
+    "bottomRight": {
+      "x": 121.12,
+      "y": 70.89
+    }
+  },
+  "porto-velho_wac_20251225.pdf": {
+    "topLeft": {
+      "x": 19.55,
+      "y": 1.95
+    },
+    "bottomRight": {
+      "x": 120.95,
+      "y": 70.8
+    }
+  },
+  "imperatriz_wac_20240711.pdf": {
+    "topLeft": {
+      "x": 20.95,
+      "y": 3.72
+    },
+    "bottomRight": {
+      "x": 123.23,
+      "y": 72.23
+    }
+  },
+  "curitiba_wac_20240516.pdf": {
+    "topLeft": {
+      "x": 29.35,
+      "y": 3.14
+    },
+    "bottomRight": {
+      "x": 124.5,
+      "y": 73.29
+    }
+  },
+  "sao-luis---em-vigor-25-jan-24_wac_20240125.pdf": {
+    "topLeft": {
+      "x": 20.65,
+      "y": 4.41
+    },
+    "bottomRight": {
+      "x": 123.16,
+      "y": 72.98
+    }
+  },
+  "manaus_wac_20251225.pdf": {
+    "topLeft": {
+      "x": 20.55,
+      "y": 2.9
+    },
+    "bottomRight": {
+      "x": 124.55,
+      "y": 72.81
+    }
+  },
+  "goiania_wac_20240516.pdf": {
+    "topLeft": {
+      "x": 24.25,
+      "y": 2.8
+    },
+    "bottomRight": {
+      "x": 124.01,
+      "y": 72.74
+    }
+  },
+  "santarem_wac_20241031.pdf": {
+    "topLeft": {
+      "x": 18.81,
+      "y": 2.01
+    },
+    "bottomRight": {
+      "x": 121.3,
+      "y": 70.63
+    }
+  },
+  "fortaleza_wac_20241031.pdf": {
+    "topLeft": {
+      "x": 21.05,
+      "y": 2.72
+    },
+    "bottomRight": {
+      "x": 124.58,
+      "y": 72.27
+    }
+  },
+  "campo-grande_wac_20240808.pdf": {
+    "topLeft": {
+      "x": 26.78,
+      "y": 3.88
+    },
+    "bottomRight": {
+      "x": 122.88,
+      "y": 73.17
+    }
+  },
+  "rio-da-prata_wac_20241031.pdf": {
+    "topLeft": {
+      "x": 21.39,
+      "y": 3.54
+    },
+    "bottomRight": {
+      "x": 122.94,
+      "y": 73.5
+    }
+  },
+  "cachimbo_wac_20251127.pdf": {
+    "topLeft": {
+      "x": 21.47,
+      "y": 2.61
+    },
+    "bottomRight": {
+      "x": 124.13,
+      "y": 72.16
+    }
+  },
+  "serra-pacaraima_wac_20250807.pdf": {
+    "topLeft": {
+      "x": 21.58,
+      "y": 3.8
+    },
+    "bottomRight": {
+      "x": 123.52,
+      "y": 72.29
+    }
+  },
+  "sao-gabriel-da-cachoeira_wac_20251030.pdf": {
+    "topLeft": {
+      "x": 20.58,
+      "y": 5.67
+    },
+    "bottomRight": {
+      "x": 123.79,
+      "y": 72.31
+    }
+  },
+  "aragarcas_wac_20251030.pdf": {
+    "topLeft": {
+      "x": 20.79,
+      "y": 1.56
+    },
+    "bottomRight": {
+      "x": 122.34,
+      "y": 71.15
+    }
+  },
+  "macapa_wac_20241226.pdf": {
+    "topLeft": {
+      "x": 21.12,
+      "y": 3.77
+    },
+    "bottomRight": {
+      "x": 125.59,
+      "y": 72.13
+    }
+  },
+  "porto-alegre_wac_20250612.pdf": {
+    "topLeft": {
+      "x": 30.9,
+      "y": 3.19
+    },
+    "bottomRight": {
+      "x": 123.45,
+      "y": 73.02
+    }
+  },
+  "foz-do-iguacu-_wac_20250710.pdf": {
+    "topLeft": {
+      "x": 28.55,
+      "y": 1.66
+    },
+    "bottomRight": {
+      "x": 123.66,
+      "y": 72.49
+    }
+  },
+  "sao-paulo_wac_20250807.pdf": {
+    "topLeft": {
+      "x": 24.54,
+      "y": 1.53
+    },
+    "bottomRight": {
+      "x": 121.74,
+      "y": 71.18
+    }
+  },
+  "cabo-orange_wac_20250807.pdf": {
+    "topLeft": {
+      "x": 21.47,
+      "y": 3.03
+    },
+    "bottomRight": {
+      "x": 124.18,
+      "y": 72.23
+    }
+  },
+  "ji-parana_wac_20250710.pdf": {
+    "topLeft": {
+      "x": 21.74,
+      "y": 3.64
+    },
+    "bottomRight": {
+      "x": 124,
+      "y": 72.81
+    }
+  },
+  "rondonopolis_wac_20251002.pdf": {
+    "topLeft": {
+      "x": 24.35,
+      "y": 3.61
+    },
+    "bottomRight": {
+      "x": 123.17,
+      "y": 72.86
+    }
+  },
+  "petrolina_wac_20250710.pdf": {
+    "topLeft": {
+      "x": 21.3,
+      "y": 3.11
+    },
+    "bottomRight": {
+      "x": 123.41,
+      "y": 71.94
+    }
+  },
+  "cruzeiro-do-sul_wac_20241128.pdf": {
+    "topLeft": {
+      "x": 20.87,
+      "y": 3.64
+    },
+    "bottomRight": {
+      "x": 123.15,
+      "y": 72.55
+    }
+  },
+  "cuiaba_wac_20251127.pdf": {
+    "topLeft": {
+      "x": 22.52,
+      "y": 2.66
+    },
+    "bottomRight": {
+      "x": 123.08,
+      "y": 72.52
+    }
+  },
+  "belem_wac_20241031.pdf": {
+    "topLeft": {
+      "x": 20.83,
+      "y": 2.93
+    },
+    "bottomRight": {
+      "x": 125.05,
+      "y": 72.32
+    }
+  },
+  "recife_wac_20251225.pdf": {
+    "topLeft": {
+      "x": 14.29,
+      "y": 2.56
+    },
+    "bottomRight": {
+      "x": 112.93,
+      "y": 69.01
+    }
+  },
+  "uruguaiana_wac_20240808.pdf": {
+    "topLeft": {
+      "x": 32.32,
+      "y": 3.3
+    },
+    "bottomRight": {
+      "x": 123.39,
+      "y": 73.32
+    }
+  },
+  "salvador_wac_20240808.pdf": {
+    "topLeft": {
+      "x": 22.71,
+      "y": 3.64
+    },
+    "bottomRight": {
+      "x": 123.06,
+      "y": 72.45
+    }
+  },
+  "bela-vista_wac_20241226.pdf": {
+    "topLeft": {
+      "x": 26.06,
+      "y": 3.69
+    },
+    "bottomRight": {
+      "x": 122.59,
+      "y": 72.64
+    }
+  },
+  "belo-horizonte_wac_20240516.pdf": {
+    "topLeft": {
+      "x": 24.43,
+      "y": 3.48
+    },
+    "bottomRight": {
+      "x": 123.28,
+      "y": 72.89
+    }
+  },
+  "tarauaca_wac_20241031.pdf": {
+    "topLeft": {
+      "x": 21.64,
+      "y": 2.15
+    },
+    "bottomRight": {
+      "x": 124.45,
+      "y": 72.42
+    }
+  },
+  "fernando-de-noronha_wac_20251127.pdf": {
+    "topLeft": {
+      "x": 21.76,
+      "y": 1.61
+    },
+    "bottomRight": {
+      "x": 124.44,
+      "y": 72.04
+    }
+  },
+  "corumba_wac_20241031.pdf": {
+    "topLeft": {
+      "x": 24.43,
+      "y": 3.64
+    },
+    "bottomRight": {
+      "x": 123.1,
+      "y": 72.87
+    }
+  },
+  "teresina_wac_20251225.pdf": {
+    "topLeft": {
+      "x": 21.05,
+      "y": 2.48
+    },
+    "bottomRight": {
+      "x": 124.52,
+      "y": 72.81
+    }
+  }
+}

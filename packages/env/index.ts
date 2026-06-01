@@ -15,6 +15,9 @@ export const env = createEnv({
     shared: {
         NEXT_PUBLIC_API_URL: z.url(),
         NEXT_PUBLIC_URL: z.url(),
+        AISWEB_API_URL: z.url(),
+        AISWEB_API_KEY: z.string(),
+        AISWEB_API_PASSWORD: z.string(),
     },
     runtimeEnv: {
         PORT: process.env.PORT,
@@ -25,6 +28,9 @@ export const env = createEnv({
         GITHUB_OAUTH_CLIENT_REDIRECT_URI: process.env.GITHUB_OAUTH_CLIENT_REDIRECT_URI,
         NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
         NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
+        AISWEB_API_URL: process.env.AISWEB_API_URL,
+        AISWEB_API_KEY: process.env.AISWEB_API_KEY,
+        AISWEB_API_PASSWORD: process.env.AISWEB_API_PASSSWORD,
     },
     emptyStringAsUndefined: true,
 })

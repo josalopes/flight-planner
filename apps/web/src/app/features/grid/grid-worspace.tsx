@@ -11,6 +11,9 @@ import { RulerLayer, RulerUnit } from "../../engine/layers/RulerLayer"
 import { Move, Ruler, Undo2, Redo2 } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 
+// import { loadPDF } from "../../../app/utils/load-pdf"
+import { loadPDFIntoEngine } from "../../../app/utils/load-pdf-into-engine"
+
 interface Props {
   label: string
   active: boolean
@@ -108,6 +111,58 @@ export default function GridWorkspace() {
     showSubdivisions
   ])
 
+  async function handleLoadMap() {
+    if (!engine.current) return
+
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/belo-horizonte_wac_20240516.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/recife_wac_20251225.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/fortaleza_wac_20241031.pdf"
+    const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/salvador_wac_20240808.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/brasilia---em-vigor-em-25-jan-24-_wac_20240125.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/sao-luis---em-vigor-25-jan-24_wac_20240125.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/itaituba---em-vigor-25-jan-24_wac_20240125.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/porto-nacional_wac_20240516.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/goiania_wac_20240516.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/curitiba_wac_20240516.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/imperatriz_wac_20240711.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/campo-grande_wac_20240808.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/uruguaiana_wac_20240808.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/belem_wac_20241031.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/santarem_wac_20241031.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/tarauaca_wac_20241031.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/corumba_wac_20241031.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/rio-da-prata_wac_20241031.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/cruzeiro-do-sul_wac_20241128.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/natal_wac_20241128.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/boa-vista_wac_20241226.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/tumucumaque_wac_20241226.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/macapa_wac_20241226.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/bela-vista_wac_20241226.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/porto-alegre_wac_20250612.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/petrolina_wac_20250710.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/ji-parana_wac_20250710.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/principe-da-beira_wac_20250710.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/foz-do-iguacu-_wac_20250710.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/cabo-orange_wac_20250807.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/monte-roraima_wac_20250807.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/sao-paulo_wac_20250807.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/serra-pacaraima_wac_20250807.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/rondonopolis_wac_20251002.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/sao-gabriel-da-cachoeira_wac_20251030.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/aragarcas_wac_20251030.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/rio-de-janeiro_wac_20251030.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/humaita_wac_20251127.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/fernando-de-noronha_wac_20251127.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/cachimbo_wac_20251127.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/cuiaba_wac_20251127.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/pico-da-neblina_wac_20251225.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/manaus_wac_20251225.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/tabatinga_wac_20251225.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/teresina_wac_20251225.pdf"
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/porto-velho_wac_20251225.pdf"
+    await loadPDFIntoEngine(url, engine.current)
+  }
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="flex flex-col">
@@ -175,6 +230,14 @@ export default function GridWorkspace() {
             className="border px-4 py-2 rounded hover:bg-gray-100"
           >
             Carregar Imagem
+          </button>
+          
+          {/* Upload mapa */}
+          <button
+            onClick={handleLoadMap}
+            className="border px-4 py-2 rounded hover:bg-gray-100"
+          >
+            Carregar mapa
           </button>
 
           <input
