@@ -4,6 +4,8 @@ import { GridLayer } from "./layers/GridLayer"
 import { DistanceLayer } from "./layers/DistanceLayer"
 import { Tool } from "./types/Tool"
 import jsPDF from "jspdf"
+import { ChartMetadata } from "@/server/aisweb/types"
+import { latLonToPixel } from "../utils/latlon-to-pixel"
 
 export type ToolType =
   | "pan"
@@ -253,6 +255,59 @@ export class CanvasEngine {
     }
   }
 
+  public centerAt(
+    x: number,
+    y: number,
+    zoom = this.scale
+  ) {
+    this.scale = zoom
+
+    const canvas = this.getCanvas()
+
+    this.offset.x =
+      canvas.width / 2 -
+      x * zoom -
+      this.rulerSize
+
+    this.offset.y =
+      canvas.height / 2 -
+      y * zoom -
+      this.rulerSize
+
+    this.render()
+  }
+
+  public centerAtLatLon(
+    lat: number,
+    lon: number,
+    chart: ChartMetadata,
+    zoom = this.scale
+  ) {
+    const point =
+      latLonToPixel(
+        lat,
+        lon,
+        chart
+      )
+
+    this.centerAt(
+      point.x,
+      point.y,
+      zoom
+    )
+  }
+
+  addLayerAt(
+    index: number,
+    layer: CanvasLayer
+  ) {
+    this.layers.splice(
+      index,
+      0,
+      layer
+    )
+  }
+
   // =========================
   // Public getters
   // =========================
@@ -445,7 +500,6 @@ export class CanvasEngine {
       if (layer.visible === false) continue
       if (layer.isUI) continue
       if (excluded.includes(layer.id)) continue
-
       layer.draw(ctx, this)
     }
 
@@ -459,7 +513,6 @@ export class CanvasEngine {
       if (layer.visible === false) continue
       if (!layer.isUI) continue
       if (excluded.includes(layer.id)) continue
-
       layer.draw(ctx, this)
     }
 

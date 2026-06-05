@@ -4,15 +4,12 @@ import { useState, useEffect, useRef } from "react"
 import { useCanvasEngine } from "../../hooks/useCanvasEngine"
 import { CanvasViewer } from "../../components/canvas-viewer"
 import { GridLayer } from "../../engine/layers/GridLayer"
-import { GridControls } from "../../components/grid-controls"
 import { ImageLayer } from "../../engine/layers/ImageLayer"
 import { CrosshairLayer } from "../../engine/layers/CrossHairLayer"
-import { RulerLayer, RulerUnit } from "../../engine/layers/RulerLayer"
-import { Move, Ruler, Undo2, Redo2 } from "lucide-react"
+import { RulerUnit } from "../../engine/layers/RulerLayer"
 import { Separator } from "@/components/ui/separator"
 
-// import { loadPDF } from "../../../app/utils/load-pdf"
-import { loadPDFIntoEngine } from "../../../app/utils/load-pdf-into-engine"
+import { testRoute1 } from "@/app/utils/test-route1"
 
 interface Props {
   label: string
@@ -44,8 +41,8 @@ export default function GridWorkspace() {
   const [dpi, setDpi] = useState(96)
   const [paperSize, setPaperSize] = useState("A4")
   const [orientation, setOrientation] = useState("portrait")
-  const [showSubdivisions, setShowSubdivisions] = useState(true)
-  const [showMainGrid, setShowMainGrid] = useState(true)
+  const [showSubdivisions, setShowSubdivisions] = useState(false)
+  const [showMainGrid, setShowMainGrid] = useState(false)
   const [showCrosshair, setShowCrosshair] = useState(true)
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
@@ -101,7 +98,6 @@ export default function GridWorkspace() {
     gridLayer.showSubdivisions = showSubdivisions
 
     eng.render()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     spacing,
     thickness,
@@ -113,54 +109,11 @@ export default function GridWorkspace() {
 
   async function handleLoadMap() {
     if (!engine.current) return
+    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/salvador_wac_20240808.pdf"
 
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/belo-horizonte_wac_20240516.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/recife_wac_20251225.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/fortaleza_wac_20241031.pdf"
-    const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/salvador_wac_20240808.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/brasilia---em-vigor-em-25-jan-24-_wac_20240125.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/sao-luis---em-vigor-25-jan-24_wac_20240125.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/itaituba---em-vigor-25-jan-24_wac_20240125.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/porto-nacional_wac_20240516.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/goiania_wac_20240516.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/curitiba_wac_20240516.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/imperatriz_wac_20240711.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/campo-grande_wac_20240808.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/uruguaiana_wac_20240808.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/belem_wac_20241031.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/santarem_wac_20241031.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/tarauaca_wac_20241031.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/corumba_wac_20241031.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/rio-da-prata_wac_20241031.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/cruzeiro-do-sul_wac_20241128.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/natal_wac_20241128.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/boa-vista_wac_20241226.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/tumucumaque_wac_20241226.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/macapa_wac_20241226.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/bela-vista_wac_20241226.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/porto-alegre_wac_20250612.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/petrolina_wac_20250710.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/ji-parana_wac_20250710.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/principe-da-beira_wac_20250710.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/foz-do-iguacu-_wac_20250710.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/cabo-orange_wac_20250807.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/monte-roraima_wac_20250807.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/sao-paulo_wac_20250807.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/serra-pacaraima_wac_20250807.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/rondonopolis_wac_20251002.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/sao-gabriel-da-cachoeira_wac_20251030.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/aragarcas_wac_20251030.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/rio-de-janeiro_wac_20251030.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/humaita_wac_20251127.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/fernando-de-noronha_wac_20251127.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/cachimbo_wac_20251127.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/cuiaba_wac_20251127.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/pico-da-neblina_wac_20251225.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/manaus_wac_20251225.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/tabatinga_wac_20251225.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/teresina_wac_20251225.pdf"
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/porto-velho_wac_20251225.pdf"
-    await loadPDFIntoEngine(url, engine.current)
+    // await loadPDFIntoEngine(url, engine.current)
+    await testRoute1(engine.current)
+    // await loadChartForCalibration(url, engine.current)
   }
 
   return (
@@ -234,10 +187,11 @@ export default function GridWorkspace() {
           
           {/* Upload mapa */}
           <button
+            // onClick={() => handleGetAerodrome("SBSV")}
             onClick={handleLoadMap}
             className="border px-4 py-2 rounded hover:bg-gray-100"
           >
-            Carregar mapa
+            Carregar rota
           </button>
 
           <input
@@ -312,8 +266,9 @@ export default function GridWorkspace() {
     </div>
 
       {/* CONTEÚDO */}
-      <div className="ml-8 pt-24 flex gap-8 px-8">
-        <GridControls
+      <div className="ml-8 flex px-8">
+      {/* <div className="ml-8 pt-24 flex gap-8 px-8"> */}
+        {/* <GridControls
           spacing={spacing}
           setSpacing={setSpacing}
           thickness={thickness}
@@ -322,7 +277,7 @@ export default function GridWorkspace() {
           setColor={setColor}
           dpi={dpi}
           setDpi={setDpi}
-        />
+        /> */}
 
         <div className="flex-1">
           <CanvasViewer

@@ -1,12 +1,15 @@
 import { CanvasEngine } from "../engine/CanvasEngine"
 import { ImageLayer } from "../engine/layers/ImageLayer"
 import { calibrationToCrop } from "../utils/calibration-to-crop"
+import { getChartCalibration } from "./get-chart-calibration"
+import { createFlightLeg } from "@/server/aisweb/create-flight-leg"
+import { testRoute } from "./test-route"
 
 export async function loadPDFIntoEngine(
   url: string,
   engine: CanvasEngine
 ) {
-  const pdfjsLib = await import(
+const pdfjsLib = await import(
     "pdfjs-dist/legacy/build/pdf.mjs"
   )
 
@@ -17,13 +20,9 @@ export async function loadPDFIntoEngine(
     ).toString()
 
   const pdfCanvas = document.createElement("canvas")
-
   const pdf = await pdfjsLib.getDocument(url).promise
-
   const page = await pdf.getPage(1)
-
   const pdfName = url.split("/").pop() ?? "unknown"
-
   const viewport = page.getViewport({ scale: 2 })
 
   pdfCanvas.width = viewport.width
@@ -34,54 +33,37 @@ export async function loadPDFIntoEngine(
     viewport
   }).promise
 
-  const img = new Image()
-  const ppu = engine.getPixelsPerUnit()
 
-  img.onload = () => {
+  const img = new Image()
+
+  img.onload = async () => {
     const imageLayer = engine.getLayer<ImageLayer>("image")
+
+    const calibration = getChartCalibration(pdfName)
+      if (calibration) {
+        const ppu = engine.getPixelsPerUnit()
+
+        imageLayer?.setCrop({
+            x: calibration.topLeft.x * ppu,
+            y: calibration.topLeft.y * ppu,
+
+            width:
+            (calibration.bottomRight.x -
+            calibration.topLeft.x) * ppu,
+
+            height:
+            (calibration.bottomRight.y -
+            calibration.topLeft.y) * ppu
+        })
+      }
     
     imageLayer?.setImage(img)
-
-    // imageLayer?.setCrop(null)
-
-    const saved = localStorage.getItem(
-      `chart:${pdfName}`
-    )
-
-    if (saved) {
-      const calibration = JSON.parse(saved) as ChartCalibration
-    }
     
-    const calibration: ChartCalibration = {
-      topLeft: {
-        x: 19.55,
-        y: 1.95
-      },
-
-      bottomRight: {
-        x: 120.95,
-        y: 70.80
-      },  
-    }
-
-
-    const ppu = engine.getPixelsPerUnit()
-
-    const crop =
-      calibrationToCrop(
-        calibration,
-        engine.getPixelsPerUnit()
-    )
-
-    imageLayer?.setCrop(crop)
-
-    localStorage.setItem(
-      `chart:${pdfName}`,
-      JSON.stringify(calibration)
-    )
-
     engine.render()
+
+    await testRoute(engine)
   }
 
   img.src = pdfCanvas.toDataURL("image/png")
 }
+

@@ -32,15 +32,16 @@ export class ImageLayer implements CanvasLayer {
     if (!this.crop) {
       ctx.drawImage(this.image, 0, 0)
 
+      // esse era o retângulo fixo usado durante o processo de crop
       ctx.strokeStyle = "red"
       ctx.lineWidth = 2
 
-      ctx.strokeRect(
-        858,
-        138,
-        3793,
-        2600
-      )
+      // ctx.strokeRect(
+      //   858,
+      //   138,
+      //   3793,
+      //   2600
+      // )
 
       return
     }
