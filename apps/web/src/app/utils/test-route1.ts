@@ -7,87 +7,135 @@ import { findChartByAerodrome } from "@/server/aisweb/find-chart"
 import { loadChart } from "@/server/aisweb/load-chart"
 import { latLonToWorld } from "./latlon-to-world"
 import { ChartLayer } from "../engine/layers/ChartLayer"
-import { RECIFE_WAC, SALVADOR_WAC } from "@/data/chart-catalogue"
+import { bearing } from "./get-bearing"
+import { haversineNm } from "./get-distance"
 
 export async function testRoute1(
   engine: CanvasEngine
 ) {
 
+  engine.removeLayersByPrefix("chart-")
+
   const objectLayer = engine.getLayer<ObjectLayer>("objects")
   if (!objectLayer) return
   
-  const partida = await getAerodrome("SBSV")
-  const destino = await getAerodrome("SBAR")
+  const departure = await getAerodrome("SNIU")
+  const arrival = await getAerodrome("SNJK")
 
-  const salvadorLayer = new ChartLayer(SALVADOR_WAC)
-  const recifeLayer = new ChartLayer(RECIFE_WAC)
-
-  if (!engine.getLayer(`chart-${SALVADOR_WAC.id}`)) {
-    engine.addLayerAt(0, salvadorLayer)
-  }
-
-  if (!engine.getLayer(`chart-${RECIFE_WAC.id}`)) {
-    engine.addLayerAt(1, recifeLayer)
-  }
-
-  const salvadorImg = await loadChart(SALVADOR_WAC)
-  salvadorLayer.setImage(salvadorImg)
-
-  const recifeImg = await loadChart(RECIFE_WAC)
-  recifeLayer.setImage(recifeImg)
-
-  const partidaChart =
+  const departureChart =
     findChartByAerodrome(
         {
-        lat: partida.lat,
-        lon: partida.lon
+        lat: departure.lat,
+        lon: departure.lon
         }
     )
 
-  if (!partidaChart) {
+  if (!departureChart) {
     throw new Error(
-        `Carta não encontrada para ${partida.icao}`
+        `Carta não encontrada para ${departure.icao}`
     )
   }
 
-  const destinoChart =
+  const arrivalChart =
     findChartByAerodrome(
         {
-          lat: destino.lat,
-          lon: destino.lon
+          lat: arrival.lat,
+          lon: arrival.lon
         }
+  )
+
+  if (!arrivalChart) {
+     throw new Error(
+       `Carta não encontrada para ${arrival.icao}`
+     )
+  }
+
+  let departureLayer =
+      engine.getLayer<ChartLayer>(
+          `chart-${departureChart.id}`
    )
 
-   if (!destinoChart) {
-     throw new Error(
-       `Carta não encontrada para ${destino.icao}`
-     )
+   if (!departureLayer) {
+       departureLayer = new ChartLayer(departureChart)
+
+        engine.addLayerAt(
+            0,
+            departureLayer
+        )
    }
 
-   const start =
+  let arrivalLayer =
+        engine.getLayer<ChartLayer>(
+          `chart-${arrivalChart.id}`
+  )
+
+  if (!arrivalLayer) {
+        arrivalLayer = new ChartLayer(arrivalChart)
+
+        engine.addLayerAt(
+            1,
+            arrivalLayer
+        )
+  }
+
+  const departureImg = await loadChart(departureChart)
+  departureLayer.setImage(departureImg)
+
+  const arrivalImg = await loadChart(arrivalChart)
+  arrivalLayer.setImage(arrivalImg)
+
+  const start =
     latLonToWorld(
-        partida.lat,
-        partida.lon
+      departure.lat,
+      departure.lon
+  )
+
+  const centerLon =
+    (departureChart.west + departureChart.east) / 2
+
+  const centerLat =
+    (departureChart.north + departureChart.south) / 2
+
+  const center =
+    latLonToWorld(
+      centerLat,
+      centerLon
+  )
+
+  const end =
+    latLonToWorld(
+        arrival.lat,
+        arrival.lon
+    )
+    
+  engine.fitRoute(
+      start,
+      end
     )
 
-    engine.centerAt(
-        start.x,
-        start.y,
-        0.4
+  const distanceNm =
+    haversineNm(
+        departure.lat,
+        departure.lon,
+        arrival.lat,
+        arrival.lon
     )
 
-    const end =
-      latLonToWorld(
-        destino.lat,
-        destino.lon
-    )
-
+  const routeBearing =
+    bearing(
+        departure.lat,
+        departure.lon,
+        arrival.lat,
+        arrival.lon
+    )  
 
   objectLayer.add(
     new RouteObject(
       start,
       end,
-      `${partida.icao} → ${destino.icao}`
+      `${departure.icao} → ${arrival.icao}`,
+      distanceNm,
+      routeBearing
     )
   )
 

@@ -1,5 +1,7 @@
+import { getDistance } from "@/app/utils/get-distance"
 import { CanvasEngine } from "../CanvasEngine"
 import { GraphicObject } from "./GraphicObject"
+import { getBearing } from "@/app/utils/get-bearing"
 
 interface Point {
   x: number
@@ -16,8 +18,14 @@ export class RouteObject implements GraphicObject {
   constructor(
     public start: Point,
     public end: Point,
-    public label?: string
+    public label?: string,
+    public distanceNm?: number,
+    public bearing?: number
   ) {}
+
+  
+
+  
 
   draw(
     ctx: CanvasRenderingContext2D,
@@ -52,6 +60,32 @@ export class RouteObject implements GraphicObject {
     )
 
     ctx.stroke()
+
+    const t =
+      this.distanceNm && this.distanceNm < 50
+        ? 0.35
+        : 0.5
+
+    const centerX =
+      this.start.x +
+      (this.end.x - this.start.x) * t
+
+    const centerY =
+      this.start.y +
+      (this.end.y - this.start.y) * t
+
+    let angle =
+      Math.atan2(
+        this.end.y - this.start.y,
+        this.end.x - this.start.x
+      )
+
+    if (
+      angle > Math.PI / 2 ||
+      angle < -Math.PI / 2
+    ) {
+      angle += Math.PI
+    }
 
     // =========================
     // Pontos origem/destino
@@ -128,6 +162,93 @@ export class RouteObject implements GraphicObject {
         bounds.height
       )
     }
+
+    ctx.restore()
+
+    // =========================
+    // Desenha caixa de info
+    // =========================
+    const bearingText =
+      this.bearing
+        ?.toFixed(0)
+        .padStart(3, "0")
+
+    const line1 = `${bearingText}°`
+    const distanceKm = (this.distanceNm ?? 0) * 1.852
+    const line2 = `${this.distanceNm?.toFixed(0)} NM • ${distanceKm.toFixed(0)} KM`  
+
+    const dx = this.end.x - this.start.x
+    const dy = this.end.y - this.start.y
+
+    const len = Math.hypot(dx, dy)
+
+    const nx = -dy / len
+    const ny = dx / len
+
+    const offset = 30 / engine.scale
+
+    ctx.save()
+
+    ctx.translate(
+      centerX + nx * offset, 
+      centerY + ny * offset
+    )
+    
+    ctx.font = `${13 / engine.scale}px Arial`
+    const width1 = ctx.measureText(line1).width
+    
+    ctx.font = `${11 / engine.scale}px Arial`
+    const width2 = ctx.measureText(line2).width
+
+    const paddingX = 18 / engine.scale
+
+    const textWidth = Math.max(width1, width2)
+    const boxWidth = textWidth + paddingX * 2
+    const boxHeight = 32 / engine.scale
+    const boxY = 0  //-40 / engine.scale
+
+    const line1Y = 11 / engine.scale
+    const line2Y = 23 / engine.scale
+    // const line1Y = boxY + 13 / engine.scale
+    // const line2Y = boxY + 27 / engine.scale
+
+    ctx.fillStyle = "rgba(255,255,255,0.75)"
+
+    ctx.strokeStyle = "#333"
+
+    ctx.lineWidth = 1 / engine.scale
+
+    ctx.beginPath()
+
+    ctx.roundRect(
+      -boxWidth / 2,
+      boxY,
+      boxWidth,
+      boxHeight,
+      4 / engine.scale
+    )
+
+    ctx.fill()
+    ctx.stroke()
+
+    ctx.fillStyle = "#000"
+
+    ctx.textAlign = "center"
+    ctx.textBaseline = "middle"
+
+    ctx.font = `${13 / engine.scale}px Arial`
+    ctx.fillText(
+      line1,
+      0,
+      line1Y
+    )
+
+    ctx.font = `${11 / engine.scale}px Arial`
+    ctx.fillText(
+      line2,
+      0,
+      line2Y
+    )
 
     ctx.restore()
   }

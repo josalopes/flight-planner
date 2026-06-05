@@ -30,7 +30,7 @@ export class CanvasEngine {
   private undoStack: Command[] = []
   private redoStack: Command[] = []
   
-  public rulerSize = 30
+  // public rulerSize = 30
   public scale = 1
   public offset = { x: 0, y: 0 }
   public cursor = { x: 0, y: 0 }
@@ -266,13 +266,11 @@ export class CanvasEngine {
 
     this.offset.x =
       canvas.width / 2 -
-      x * zoom -
-      this.rulerSize
+      x * zoom
 
     this.offset.y =
       canvas.height / 2 -
-      y * zoom -
-      this.rulerSize
+      y * zoom
 
     this.render()
   }
@@ -308,6 +306,62 @@ export class CanvasEngine {
     )
   }
 
+  public fitRoute(
+    start: { x: number; y: number },
+    end: { x: number; y: number },
+    padding = 100
+  ) {
+    const canvas = this.getCanvas()
+
+    const minX = Math.min(start.x, end.x)
+
+    const maxX = Math.max(start.x, end.x)
+
+    const minY = Math.min(start.y, end.y)
+
+    const maxY = Math.max(start.y, end.y)
+
+    const routeWidth =
+      Math.max(
+        100,
+        maxX - minX
+      )
+
+    const routeHeight =
+      Math.max(
+        100,
+        maxY - minY
+      )
+
+    const zoomX =
+      (canvas.width - padding * 2)
+      /
+      routeWidth
+
+    const zoomY =
+      (canvas.height - padding * 2)
+      /
+      routeHeight
+
+    const zoom =
+      Math.min(0.8,
+        zoomX,
+        zoomY
+      )
+
+    const centerX =
+      (minX + maxX) / 2
+
+    const centerY =
+      (minY + maxY) / 2
+
+    this.centerAt(
+      centerX,
+      centerY,
+      zoom
+    )
+  }
+
   // =========================
   // Public getters
   // =========================
@@ -327,8 +381,8 @@ export class CanvasEngine {
         const imageLayer = this.getLayer<ImageLayer>("image")
         imageLayer?.setImage(null)
 
-        this.canvas.width = 1200
-        this.canvas.height = 800
+        this.canvas.width = 1920
+        this.canvas.height = 1080
 
         this.render()
     }
@@ -386,6 +440,23 @@ export class CanvasEngine {
   // Layer Management
   // =========================
 
+  removeLayersByPrefix(prefix: string) {
+    this.layers =
+      this.layers.filter(
+        layer =>
+          !layer.id.startsWith(prefix)
+    )
+
+    this.render()
+  }
+
+  removeLayer(id: string) {
+    this.layers =
+      this.layers.filter(
+        layer => layer.id !== id
+    )
+  }
+
   addLayer(layer: CanvasLayer) {
     this.layers.push(layer)
   }
@@ -429,8 +500,8 @@ export class CanvasEngine {
     this.previousCursor = { ...this.cursor }
 
     // atualizar cursor SEMPRE
-    this.cursor.x = (screenX - this.offset.x - this.rulerSize) / this.scale
-    this.cursor.y = (screenY - this.offset.y - this.rulerSize) / this.scale
+    this.cursor.x = (screenX - this.offset.x) / this.scale
+    this.cursor.y = (screenY - this.offset.y) / this.scale
 
     // ferramenta tem prioridade
     if (this.activeTool?.onMouseMove) {
@@ -492,8 +563,8 @@ export class CanvasEngine {
       0,
       0,
       this.scale,
-      this.offset.x + this.rulerSize,
-      this.offset.y + this.rulerSize
+      this.offset.x,
+      this.offset.y
     )
 
     for (const layer of this.layers) {

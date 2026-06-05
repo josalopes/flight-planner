@@ -23,3 +23,15 @@ function findChart(
     lon <= chart.east
   )
 }
+
+export function findChartByLatLon(
+  lat: number,
+  lon: number
+) {
+  return charts.find(chart =>
+    lat <= chart.north &&
+    lat >= chart.south &&
+    lon >= chart.west &&
+    lon <= chart.east
+  )
+}
