@@ -67,8 +67,31 @@ export const RECIFE_WAC: ChartMetadata = {
   nativeResolution: "high" 
 }
 
-export const charts: ChartMetadata[] = [
+export const PETROLINA_WAC: ChartMetadata = {
+  id: "3067",
+  name: "PETROLINA",
+
+  imageUrl: "/charts/3067.png",
+
+  width: 7875,
+  height: 5250,
+
+  west: -45.0012891,
+  east: -39.0010725,
+
+  north: -8.0005725,
+  south: -12.0007169,
+
+  crs: "EPSG:4326",
+  pixelSizeX: 1000,
+  pixelSizeY: 1000,
+
+  nativeResolution: "high" 
+}
+
+export const CHART_CATALOGUE: ChartMetadata[] = [
   SALVADOR_WAC,
   BRASILIA_WAC,
-  RECIFE_WAC
+  RECIFE_WAC,
+  PETROLINA_WAC
 ]

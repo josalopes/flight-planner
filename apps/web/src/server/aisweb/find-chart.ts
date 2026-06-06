@@ -1,4 +1,4 @@
-import { charts } from "@/data/chart-catalogue"
+import { CHART_CATALOGUE } from "@/data/chart-catalogue"
 
 export function findChartByAerodrome(
   aerodrome: {
@@ -16,7 +16,7 @@ function findChart(
   lat: number,
   lon: number
 ) {
-  return charts.find(chart =>
+  return CHART_CATALOGUE.find(chart =>
     lat <= chart.north &&
     lat >= chart.south &&
     lon >= chart.west &&
@@ -28,7 +28,7 @@ export function findChartByLatLon(
   lat: number,
   lon: number
 ) {
-  return charts.find(chart =>
+  return CHART_CATALOGUE.find(chart =>
     lat <= chart.north &&
     lat >= chart.south &&
     lon >= chart.west &&

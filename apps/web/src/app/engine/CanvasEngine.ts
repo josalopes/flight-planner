@@ -6,6 +6,7 @@ import { Tool } from "./types/Tool"
 import jsPDF from "jspdf"
 import { ChartMetadata } from "@/server/aisweb/types"
 import { latLonToPixel } from "../utils/latlon-to-pixel"
+import { ChartManager } from "@/server/aisweb/ChartManager"
 
 export type ToolType =
   | "pan"
@@ -30,7 +31,7 @@ export class CanvasEngine {
   private undoStack: Command[] = []
   private redoStack: Command[] = []
   
-  // public rulerSize = 30
+  public chartManager = new ChartManager()
   public scale = 1
   public offset = { x: 0, y: 0 }
   public cursor = { x: 0, y: 0 }
@@ -314,11 +315,9 @@ export class CanvasEngine {
     const canvas = this.getCanvas()
 
     const minX = Math.min(start.x, end.x)
-
     const maxX = Math.max(start.x, end.x)
 
     const minY = Math.min(start.y, end.y)
-
     const maxY = Math.max(start.y, end.y)
 
     const routeWidth =
@@ -360,6 +359,32 @@ export class CanvasEngine {
       centerY,
       zoom
     )
+  }
+
+  public getVisibleWorldBounds() {
+    const canvas =
+      this.getCanvas()
+
+    const left =
+      -this.offset.x / this.scale
+
+    const top =
+      -this.offset.y / this.scale
+
+    const right =
+      left +
+      canvas.width / this.scale
+
+    const bottom =
+      top +
+      canvas.height / this.scale
+
+    return {
+      left,
+      top,
+      right,
+      bottom
+    }
   }
 
   // =========================

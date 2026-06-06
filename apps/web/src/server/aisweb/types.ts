@@ -65,3 +65,20 @@ export interface ChartMetadata {
   nativeResolution: "standard" | "high"
 }
 
+export function expandBounds(
+  bounds: {
+    left:number
+    top:number
+    right:number
+    bottom:number
+  },
+  margin:number
+) {
+  return {
+    left: bounds.left - margin,
+    top: bounds.top - margin,
+    right: bounds.right + margin,
+    bottom: bounds.bottom + margin
+  }
+}
+

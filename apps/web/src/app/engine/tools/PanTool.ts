@@ -15,7 +15,7 @@ export class PanTool implements Tool{
     this.lastPos = { x: e.clientX, y: e.clientY }
   }
 
-  onMouseMove(engine: CanvasEngine, e: MouseEvent) {
+  async onMouseMove(engine: CanvasEngine, e: MouseEvent) {
     if (!this.isDragging) return
 
     const dx = e.clientX - this.lastPos.x
@@ -27,6 +27,8 @@ export class PanTool implements Tool{
     this.lastPos = { x: e.clientX, y: e.clientY }
 
     engine.render()
+
+    await engine.chartManager.update(engine)
   }
 
   onMouseUp() {

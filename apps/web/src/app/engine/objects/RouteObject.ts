@@ -18,7 +18,7 @@ export class RouteObject implements GraphicObject {
   constructor(
     public start: Point,
     public end: Point,
-    public label?: string,
+    // public label?: string,
     public distanceNm?: number,
     public bearing?: number
   ) {}
@@ -123,24 +123,24 @@ export class RouteObject implements GraphicObject {
     // Label opcional
     // =========================
 
-    if (this.label) {
-      const centerX =
-        (this.start.x + this.end.x) / 2
+    // if (this.label) {
+    //   const centerX =
+    //     (this.start.x + this.end.x) / 2
 
-      const centerY =
-        (this.start.y + this.end.y) / 2
+    //   const centerY =
+    //     (this.start.y + this.end.y) / 2
 
-      ctx.font =
-        `${12 / engine.scale}px Arial`
+    //   ctx.font =
+    //     `${12 / engine.scale}px Arial`
 
-      ctx.fillStyle = "#000"
+    //   ctx.fillStyle = "#000"
 
-      ctx.fillText(
-        this.label,
-        centerX,
-        centerY
-      )
-    }
+    //   ctx.fillText(
+    //     this.label,
+    //     centerX,
+    //     centerY
+    //   )
+    // }
 
     // =========================
     // Bounding quando selecionado
@@ -173,7 +173,7 @@ export class RouteObject implements GraphicObject {
         ?.toFixed(0)
         .padStart(3, "0")
 
-    const line1 = `${bearingText}°`
+    const line1 = `TRK ${bearingText}°`
     const distanceKm = (this.distanceNm ?? 0) * 1.852
     const line2 = `${this.distanceNm?.toFixed(0)} NM • ${distanceKm.toFixed(0)} KM`  
 
@@ -205,12 +205,10 @@ export class RouteObject implements GraphicObject {
     const textWidth = Math.max(width1, width2)
     const boxWidth = textWidth + paddingX * 2
     const boxHeight = 32 / engine.scale
-    const boxY = 0  //-40 / engine.scale
+    const boxY = 0
 
     const line1Y = 11 / engine.scale
     const line2Y = 23 / engine.scale
-    // const line1Y = boxY + 13 / engine.scale
-    // const line2Y = boxY + 27 / engine.scale
 
     ctx.fillStyle = "rgba(255,255,255,0.75)"
 
