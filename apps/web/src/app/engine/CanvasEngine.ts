@@ -7,6 +7,11 @@ import jsPDF from "jspdf"
 import { ChartMetadata } from "@/server/aisweb/types"
 import { latLonToPixel } from "../utils/latlon-to-pixel"
 import { ChartManager } from "@/server/aisweb/ChartManager"
+import { worldToLatLon } from "../utils/world-to-latlon"
+import { findNearestAerodrome } from "../utils/find-nearest-aerodrome"
+import { ContextMenuInfo } from "./types/ContextMenu"
+import { findWaypointAtPosition } from "../utils/find-waypoint-at-position"
+import { Waypoint } from "@/server/flight-plan/types"
 
 export type ToolType =
   | "pan"
@@ -41,6 +46,7 @@ export class CanvasEngine {
   public snapTolerancePx = 8
   public isShiftPressed = false
   public previousCursor = { x:0, y:0 }
+  public hoveredWaypoint: Waypoint | null = null
 
   constructor(canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext("2d")
@@ -429,36 +435,39 @@ export class CanvasEngine {
     // EXPORT PDF
     // =========================
 
+    public onContextMenu?:
+      (info: ContextMenuInfo) => void
+
     public exportPDF = (paperSize: string, orientation: "portrait" | "landscape") => {
-        const pdf = new jsPDF({
-            orientation,
-            unit: "mm",
-            format: paperSize
-        })
+      const pdf = new jsPDF({
+        orientation,
+        unit: "mm",
+        format: paperSize
+      })
 
-        // renderiza temporariamente sem HUD e Ruler
-        this.render({ exclude: ["hud", "ruler", "distance"] })
-        const imgData = this.canvas.toDataURL("image/png", 1.0)
+      // renderiza temporariamente sem HUD e Ruler
+      this.render({ exclude: ["hud", "ruler", "distance"] })
+      const imgData = this.canvas.toDataURL("image/png", 1.0)
 
-        const pageWidth = pdf.internal.pageSize.getWidth()
-        const pageHeight = pdf.internal.pageSize.getHeight()
+      const pageWidth = pdf.internal.pageSize.getWidth()
+      const pageHeight = pdf.internal.pageSize.getHeight()
 
-        const canvasWidth = this.canvas.width
-        const canvasHeight = this.canvas.height
+      const canvasWidth = this.canvas.width
+      const canvasHeight = this.canvas.height
 
-        const ratio = Math.min(
-            pageWidth / canvasWidth,
-            pageHeight / canvasHeight
-        )
+      const ratio = Math.min(
+          pageWidth / canvasWidth,
+          pageHeight / canvasHeight
+      )
 
-        const imgWidth = canvasWidth * ratio
-        const imgHeight = canvasHeight * ratio
+      const imgWidth = canvasWidth * ratio
+      const imgHeight = canvasHeight * ratio
 
-        const x = (pageWidth - imgWidth) / 2
-        const y = (pageHeight - imgHeight) / 2
+      const x = (pageWidth - imgWidth) / 2
+      const y = (pageHeight - imgHeight) / 2
 
-        pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight)
-        pdf.save("grid.pdf")
+      pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight)
+      pdf.save("grid.pdf")
     }
 
   // =========================
@@ -495,19 +504,106 @@ export class CanvasEngine {
   // =========================
 
   private attachEvents() {
-    this.canvas.addEventListener("mousedown", this.onMouseDown)
-    this.canvas.addEventListener("mousemove", this.onMouseMove)
-    this.canvas.addEventListener("mouseup", this.onMouseUp)
-    this.canvas.addEventListener("mouseleave", this.onMouseUp)
-    this.canvas.addEventListener("wheel", this.onWheel, { passive: false })
-  }  
+    const canvas = this.canvas
+
+    canvas.addEventListener("mousedown", this.onMouseDown)
+    canvas.addEventListener("mousemove", this.onMouseMove)
+    canvas.addEventListener("mouseup", this.onMouseUp)
+    canvas.addEventListener("mouseleave", this.onMouseUp)
+    canvas.addEventListener("wheel", this.onWheel, { passive: false })
+    canvas.addEventListener("contextmenu", this.handleContextMenu)
+  } 
+  
+  private handleContextMenu =
+    async (
+      event: MouseEvent
+    ) => {
+
+    event.preventDefault()
+
+    const world =
+      this.screenToWorld(
+        event.offsetX,
+        event.offsetY
+      )
+
+    const position =
+      worldToLatLon(
+        world.x,
+        world.y
+      )
+
+    const waypoint =
+      findWaypointAtPosition(
+        position.lat,
+        position.lon
+      ) 
+
+    if (waypoint) {
+      this.onContextMenu?.({
+        screenX: event.clientX,
+        screenY: event.clientY,
+
+        lat: position.lat,
+        lon: position.lon,
+
+        waypoint
+      })
+
+      return
+    } 
+
+    const airport =
+      findNearestAerodrome(
+        position.lat,
+        position.lon,
+        5
+    ) 
+
+    if (airport) {
+      this.onContextMenu?.({
+        screenX: event.clientX,
+        screenY: event.clientY,
+
+        lat: position.lat,
+        lon: position.lon,
+
+        airport
+      })
+
+      return
+    }
+
+    this.onContextMenu?.({
+      screenX: event.clientX,
+      screenY: event.clientY,
+
+      lat: position.lat,
+      lon: position.lon
+    })
+  }
+
+  public screenToWorld(
+    screenX: number,
+    screenY: number
+  ) {
+    return {
+      x:
+        (screenX - this.offset.x) /
+        this.scale,
+
+      y:
+        (screenY - this.offset.y) /
+        this.scale
+    }
+  }
 
   private onMouseDown = (e: MouseEvent) => {
     if (this.activeTool?.onMouseDown) {
       this.activeTool.onMouseDown(this, e)
       return
     }
-
+    
     // fallback pan
     this.isDragging = true
     this.lastPos = { x: e.clientX, y: e.clientY }
@@ -544,7 +640,32 @@ export class CanvasEngine {
       this.lastPos = { x: e.clientX, y: e.clientY }
     }
 
-    this.render()
+    const world =
+      this.screenToWorld(
+        e.offsetX,
+        e.offsetY
+    )
+
+    const position =
+      worldToLatLon(
+        world.x,
+        world.y
+    )
+
+    const waypoint =
+      findWaypointAtPosition(
+        position.lat,
+        position.lon
+    )
+
+    if (
+      waypoint !==
+      this.hoveredWaypoint
+    ) {
+      this.hoveredWaypoint = waypoint
+
+      this.render()
+    }
 
   }
 
@@ -621,3 +742,4 @@ export class CanvasEngine {
       }    
   }
 }
+

@@ -10,167 +10,344 @@ import { ChartLayer } from "../engine/layers/ChartLayer"
 import { bearing } from "./get-bearing"
 import { haversineNm } from "./get-distance"
 import { findChartsAlongRoute } from "./find-charts-along-route"
+import {flightPlan } from "@/server/flight-plan/store"
+import { getAerodromeByIcao } from "@/server/aisweb/get-aerodrome-by-icao"
+import { drawFlightPlan } from "@/server/flight-plan/draw-flight-plan"
 
 export async function testRoute1(
   engine: CanvasEngine
 ) {
 
-  engine.removeLayersByPrefix("chart-")
+  // engine.removeLayersByPrefix("chart-")
 
-  const objectLayer = engine.getLayer<ObjectLayer>("objects")
-  if (!objectLayer) return
-  
-  const departure = await getAerodrome("SBSV")
-  const arrival = await getAerodrome("SNJK")
+  // const objectLayer =
+  //   engine.getLayer<ObjectLayer>("objects")
 
-  const departureChart =
-    findChartByAerodrome(
-      {
-        lat: departure.lat,
-        lon: departure.lon
-      }
-    )
+  // if (!objectLayer)
+  //   return
 
-  if (!departureChart) {
-    throw new Error(
-      `Carta não encontrada para ${departure.icao}`
-    )
-  }
+  // objectLayer.clear()
 
-  const arrivalChart =
-    findChartByAerodrome(
-      {
-          lat: arrival.lat,
-          lon: arrival.lon
-      }
-  )
+  flightPlan.departure =
+    getAerodromeByIcao("SBSV")
 
-  if (!arrivalChart) {
-     throw new Error(
-       `Carta não encontrada para ${arrival.icao}`
-     )
-  }
+  flightPlan.arrival =
+    getAerodromeByIcao("SNJK")
 
-  const start =
-    latLonToWorld(
-      departure.lat,
-      departure.lon
-  )
+  await drawFlightPlan(engine, true)  
 
-  const end =
-    latLonToWorld(
-        arrival.lat,
-        arrival.lon
-  )
+  // =====================================
+  // TODOS OS PONTOS DA ROTA
+  // =====================================
 
+  // const routePoints = [
+  //   {
+  //     lat: flightPlan.departure?.lat,
+  //     lon: flightPlan.departure?.lon
+  //   },
 
-  const charts =
-  findChartsAlongRoute(
-    start,
-    end
-  )
+  //   ...flightPlan.waypoints.map(
+  //     waypoint => ({
+  //       lat: waypoint.lat,
+  //       lon: waypoint.lon
+  //     })
+  //   ),
 
-  for (const chart of charts) {
+  //   {
+  //     lat: flightPlan.arrival?.lat,
+  //     lon: flightPlan.arrival?.lon
+  //   }
+  // ]
 
-    if (
-      engine.getLayer(
-        `chart-${chart.id}`
-      )
-    ) {
-    continue
-  }
+  // // =====================================
+  // // CARTAS NECESSÁRIAS
+  // // =====================================
 
-    const layer =
-      new ChartLayer(chart)
+  // const chartsMap = new Map()
 
-    engine.addLayerAt(0, layer)
+  // for (
+  //   let i = 0;
+  //   i < routePoints.length - 1;
+  //   i++
+  // ) {
 
-    const image =
-      await loadChart(chart)
-
-    layer.setImage(image)
-  }
-
-
-  // let departureLayer =
-  //     engine.getLayer<ChartLayer>(
-  //      `chart-${departureChart.id}`
-  //  )
-
-  //  if (!departureLayer) {
-  //      departureLayer = new ChartLayer(departureChart)
-
-  //     engine.addLayerAt(
-  //       0,
-  //       departureLayer
+  //   const start =
+  //     latLonToWorld(
+  //       routePoints[i].lat,
+  //       routePoints[i].lon
   //     )
-  //  }
 
-  // let arrivalLayer =
-  //       engine.getLayer<ChartLayer>(
-  //         `chart-${arrivalChart.id}`
-  // )
-
-  // if (!arrivalLayer) {
-  //     arrivalLayer = new ChartLayer(arrivalChart)
-
-  //     engine.addLayerAt(
-  //         1,
-  //         arrivalLayer
+  //   const end =
+  //     latLonToWorld(
+  //       routePoints[i + 1].lat,
+  //       routePoints[i + 1].lon
   //     )
+
+  //   const charts =
+  //     findChartsAlongRoute(
+  //       start,
+  //       end
+  //     )
+
+  //   for (const chart of charts) {
+  //     chartsMap.set(
+  //       chart.id,
+  //       chart
+  //     )
+  //   }
   // }
 
-  // const departureImg = await loadChart(departureChart)
-  // departureLayer.setImage(departureImg)
+  // // =====================================
+  // // CARREGA CARTAS
+  // // =====================================
 
-  // const arrivalImg = await loadChart(arrivalChart)
-  // arrivalLayer.setImage(arrivalImg)
+  // for (
+  //   const chart
+  //   of chartsMap.values()
+  // ) {
 
+  //   if (
+  //     engine.getLayer(
+  //       `chart-${chart.id}`
+  //     )
+  //   ) {
+  //     continue
+  //   }
 
-  const centerLon =
-    (departureChart.west + departureChart.east) / 2
+  //   const layer =
+  //     new ChartLayer(chart)
 
-  const centerLat =
-    (departureChart.north + departureChart.south) / 2
+  //   engine.addLayerAt(
+  //     0,
+  //     layer
+  //   )
 
-  const center =
-    latLonToWorld(
-      centerLat,
-      centerLon
-  )
+  //   const image =
+  //     await loadChart(chart)
 
-  
-    
-  engine.fitRoute(
-      start,
-      end
-    )
+  //   layer.setImage(image)
+  // }
 
-  const distanceNm =
-    haversineNm(
-        departure.lat,
-        departure.lon,
-        arrival.lat,
-        arrival.lon
-    )
+  // // =====================================
+  // // FIT ROUTE
+  // // =====================================
 
-  const routeBearing =
-    bearing(
-        departure.lat,
-        departure.lon,
-        arrival.lat,
-        arrival.lon
-    )  
+  // const firstPoint =
+  //   routePoints[0]
 
-  objectLayer.add(
-    new RouteObject(
-      start,
-      end,
-      // `${departure.icao} → ${arrival.icao}`,
-      distanceNm,
-      routeBearing
-    )
-  )
+  // const lastPoint =
+  //   routePoints[
+  //     routePoints.length - 1
+  //   ]
 
-  engine.render()
+  // const firstWorld =
+  //   latLonToWorld(
+  //     firstPoint.lat,
+  //     firstPoint.lon
+  //   )
+
+  // const lastWorld =
+  //   latLonToWorld(
+  //     lastPoint.lat,
+  //     lastPoint.lon
+  //   )
+
+  // engine.fitRoute(
+  //   firstWorld,
+  //   lastWorld
+  // )
+
+  // // =====================================
+  // // DESENHA SEGMENTOS
+  // // =====================================
+
+  // for (
+  //   let i = 0;
+  //   i < routePoints.length - 1;
+  //   i++
+  // ) {
+
+  //   const from =
+  //     routePoints[i]
+
+  //   const to =
+  //     routePoints[i + 1]
+
+  //   const start =
+  //     latLonToWorld(
+  //       from.lat,
+  //       from.lon
+  //     )
+
+  //   const end =
+  //     latLonToWorld(
+  //       to.lat,
+  //       to.lon
+  //     )
+
+  //   const distanceNm =
+  //     haversineNm(
+  //       from.lat,
+  //       from.lon,
+  //       to.lat,
+  //       to.lon
+  //     )
+
+  //   const routeBearing =
+  //     bearing(
+  //       from.lat,
+  //       from.lon,
+  //       to.lat,
+  //       to.lon
+  //     )
+
+  //   objectLayer.add(
+  //     new RouteObject(
+  //       start,
+  //       end,
+  //       distanceNm,
+  //       routeBearing
+  //     )
+  //   )
+  // }
+
+  // engine.render()
 }
+
+// import { getAerodrome } from "@/server/aisweb/get-aerodrome"
+// import { CanvasEngine } from "../engine/CanvasEngine"
+// import { ObjectLayer } from "../engine/layers/ObjectLayer"
+// import { RouteObject } from "../engine/objects/RouteObject"
+
+// import { findChartByAerodrome } from "@/server/aisweb/find-chart"
+// import { loadChart } from "@/server/aisweb/load-chart"
+// import { latLonToWorld } from "./latlon-to-world"
+// import { ChartLayer } from "../engine/layers/ChartLayer"
+// import { bearing } from "./get-bearing"
+// import { haversineNm } from "./get-distance"
+// import { findChartsAlongRoute } from "./find-charts-along-route"
+
+// export async function testRoute1(
+//   engine: CanvasEngine
+// ) {
+
+//   engine.removeLayersByPrefix("chart-")
+
+//   const objectLayer = engine.getLayer<ObjectLayer>("objects")
+//   if (!objectLayer) return
+  
+//   const departure = await getAerodrome("SBSV")
+//   const arrival = await getAerodrome("SNJK")
+
+//   const departureChart =
+//     findChartByAerodrome(
+//       {
+//         lat: departure.lat,
+//         lon: departure.lon
+//       }
+//     )
+
+//   if (!departureChart) {
+//     throw new Error(
+//       `Carta não encontrada para ${departure.icao}`
+//     )
+//   }
+
+//   const arrivalChart =
+//     findChartByAerodrome(
+//       {
+//           lat: arrival.lat,
+//           lon: arrival.lon
+//       }
+//   )
+
+//   if (!arrivalChart) {
+//      throw new Error(
+//        `Carta não encontrada para ${arrival.icao}`
+//      )
+//   }
+
+//   const start =
+//     latLonToWorld(
+//       departure.lat,
+//       departure.lon
+//   )
+
+//   const end =
+//     latLonToWorld(
+//         arrival.lat,
+//         arrival.lon
+//   )
+
+
+//   const charts =
+//   findChartsAlongRoute(
+//     start,
+//     end
+//   )
+
+//   for (const chart of charts) {
+
+//     if (
+//       engine.getLayer(
+//         `chart-${chart.id}`
+//       )
+//     ) {
+//     continue
+//   }
+
+//     const layer =
+//       new ChartLayer(chart)
+
+//     engine.addLayerAt(0, layer)
+
+//     const image =
+//       await loadChart(chart)
+
+//     layer.setImage(image)
+//   }
+
+//   const centerLon =
+//     (departureChart.west + departureChart.east) / 2
+
+//   const centerLat =
+//     (departureChart.north + departureChart.south) / 2
+
+//   const center =
+//     latLonToWorld(
+//       centerLat,
+//       centerLon
+//   )
+    
+//   engine.fitRoute(
+//       start,
+//       end
+//     )
+
+//   const distanceNm =
+//     haversineNm(
+//         departure.lat,
+//         departure.lon,
+//         arrival.lat,
+//         arrival.lon
+//     )
+
+//   const routeBearing =
+//     bearing(
+//         departure.lat,
+//         departure.lon,
+//         arrival.lat,
+//         arrival.lon
+//     )  
+
+//   objectLayer.add(
+//     new RouteObject(
+//       start,
+//       end,
+//       distanceNm,
+//       routeBearing
+//     )
+//   )
+
+//   engine.render()
+// }

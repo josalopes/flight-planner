@@ -10,6 +10,9 @@ import { RulerUnit } from "../../engine/layers/RulerLayer"
 import { Separator } from "@/components/ui/separator"
 
 import { testRoute1 } from "@/app/utils/test-route1"
+import { ContextMenuInfo } from "@/server/flight-plan/types"
+import { flightPlan } from "@/server/flight-plan/store"
+import { drawFlightPlan } from "@/server/flight-plan/draw-flight-plan"
 
 interface Props {
   label: string
@@ -44,9 +47,61 @@ export default function GridWorkspace() {
   const [showSubdivisions, setShowSubdivisions] = useState(false)
   const [showMainGrid, setShowMainGrid] = useState(false)
   const [showCrosshair, setShowCrosshair] = useState(true)
+  const [contextMenu, setContextMenu] = useState<any>(null)
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const { canvasRef, engine } = useCanvasEngine()
+
+  useEffect(() => {
+    if (!engine.current)
+      return
+
+    engine.current.onContextMenu =
+      info => {
+        setContextMenu(info)
+      }
+
+  }, [engine])
+
+  useEffect(() => {
+    const handleClick = () => {
+      setContextMenu(null)
+    }
+
+    window.addEventListener(
+      "click",
+      handleClick
+    )
+
+    return () =>
+      window.removeEventListener(
+        "click",
+        handleClick
+      )
+
+  }, [])
+
+  useEffect(() => {
+    const handleKeyDown =
+      (e: KeyboardEvent) => {
+
+        if (e.key === "Escape") {
+          setContextMenu(null)
+        }
+      }
+
+    window.addEventListener(
+      "keydown",
+      handleKeyDown
+    )
+
+    return () =>
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown
+      )
+
+  }, [])
 
   const loadImage = (file: File) => {
     const img = new Image()
@@ -71,7 +126,6 @@ export default function GridWorkspace() {
   }
 
   const handleUnitChange = (unit: RulerUnit) => {
-    // const ruler = engine.current?.getLayer<RulerLayer>("ruler")
     if (!engine.current) return
 
     engine.current.unit = unit
@@ -285,6 +339,187 @@ export default function GridWorkspace() {
           />
         </div>
       </div>
+
+      
+      {
+        contextMenu && (
+          <div
+            className="
+              fixed
+              bg-white
+              border
+              rounded
+              shadow-lg
+              z-50
+              min-w-55
+              p-2
+            "
+            style={{
+              left: contextMenu.screenX,
+              top: contextMenu.screenY
+            }}
+          >
+
+        {/* WAYPOINT */}
+
+        {
+          contextMenu.waypoint && (
+            <>
+              <div className="font-semibold">
+                {
+                  contextMenu.waypoint.icao ??
+                  contextMenu.waypoint.name
+                }
+              </div>
+
+              <div className="text-sm text-gray-600">
+                {contextMenu.waypoint.name}
+              </div>
+
+              <button
+                onClick={async () => {
+                  // e => e.stopProgagation()
+                  const index =
+                    flightPlan.waypoints.findIndex(
+                      wp =>
+                        wp.id ===
+                        contextMenu.waypoint.id
+                    )
+
+                  if (index >= 0) {
+
+                    flightPlan.waypoints.splice(
+                      index,
+                      1
+                    )
+
+                    await drawFlightPlan(
+                      engine.current!,
+                      false
+                    )
+                  }
+
+                  setContextMenu(null)
+                }}
+              >
+                Remover da rota
+              </button>
+            </>
+          )
+        }
+
+        {/* AIRPORT */}
+
+        {
+          contextMenu.airport && (
+            <>
+              <div className="font-semibold">
+                {contextMenu.airport.icao}
+              </div>
+
+              <div className="text-sm text-gray-600">
+                {contextMenu.airport.name}
+              </div>
+
+              <button
+                className="
+                  mt-2
+                  w-full
+                  text-left
+                  px-2
+                  py-1
+                  hover:bg-gray-100
+                "
+                onClick={async () => {
+                  // e => e.stopProgagation()
+                  const exists =
+                    flightPlan.waypoints.some(
+                      wp =>
+                        wp.icao === "AERODROME" &&
+                        contextMenu.airport.icao
+                    )
+
+                  if (!exists) {
+                    flightPlan.waypoints.push({
+                      id: crypto.randomUUID(),
+                      name: contextMenu.airport.name,
+                      icao: contextMenu.airport.icao,
+                      lat: contextMenu.airport.lat,
+                      lon: contextMenu.airport.lon,
+                      type: "AERODROME"
+                    })
+
+                    await drawFlightPlan(
+                      engine.current!,
+                      false
+                    )
+                  }
+
+                  setContextMenu(null)
+                }}
+              >
+                Adicionar à rota
+              </button>
+            </>
+          )
+        }
+
+        {/* EMPTY */}
+        {
+          !contextMenu.airport &&
+          !contextMenu.waypoint && (
+            <>
+              <div className="text-sm">
+                Lat:{" "}
+                {contextMenu.lat.toFixed(4)}
+
+                <br />
+
+                Lon:{" "}
+                {contextMenu.lon.toFixed(4)}
+              </div>
+
+              <button
+                className="
+                  mt-2
+                  w-full
+                  text-left
+                  px-2
+                  py-1
+                  hover:bg-gray-100
+                "
+                onClick={async () => {
+                  // e => e.stopProgagation()
+                  const nextWpNumber =
+                    flightPlan.waypoints.filter(
+                      wp => wp.type === "USER"
+                    ).length + 1
+
+                  flightPlan.waypoints.push({
+                    id: crypto.randomUUID(),
+                    name: `WP${nextWpNumber}`,
+                    lat: contextMenu.lat,
+                    lon: contextMenu.lon,
+                    type: "USER"
+                  })
+
+                  await drawFlightPlan(
+                    engine.current!,
+                    false
+                  )
+
+                  setContextMenu(null)
+                }}
+              >
+                Criar waypoint
+              </button>
+            </>
+          )
+        }
+      </div>
+    )
+  }
+
     </div>
   )
 }

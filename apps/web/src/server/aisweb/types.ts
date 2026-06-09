@@ -1,26 +1,28 @@
-export interface Aerodrome {
-  icao: string
-  name: string
-  city: string
-  uf: string
-  lat: number
-  lon: number
-}
+import { getAllAerodromes } from "./get-all-aerodromes"
 
-export interface Waypoint {
-  icao: string
-  name: string
-  lat: number
-  lon: number
-}
+// export interface Aerodrome {
+//   icao: string
+//   name: string
+//   city: string
+//   uf: string
+//   lat: number
+//   lon: number
+// }
 
-export interface FlightLeg {
-  origin: Aerodrome
-  destination: Aerodrome
+// export interface Waypoint {
+//   icao: string
+//   name: string
+//   lat: number
+//   lon: number
+// }
 
-  distanceNM: number
-  trueCourse: number
-}
+// export interface FlightLeg {
+//   origin: Aerodrome
+//   destination: Aerodrome
+
+//   distanceNM: number
+//   trueCourse: number
+// }
 
 export interface ChartBounds {
   north: number
@@ -81,4 +83,34 @@ export function expandBounds(
     bottom: bounds.bottom + margin
   }
 }
+
+// export class AerodromeStore {
+
+//   private airports: Aerodrome[] = []
+
+//   async load() {
+//     this.airports =
+//       await getAllAerodromes()
+//   }
+
+//   getAll() {
+//     return this.airports
+//   }
+// }
+
+// export interface FlightPlan {
+//   departure: Aerodrome
+//   arrival: Aerodrome
+//   waypoints: Waypoint[]
+// }
+
+// export interface Waypoint {
+//   id: string
+//   name: string
+//   lat: number
+//   lon: number
+//   type:
+//     | "AERODROME"
+//     | "USER"
+// }
 

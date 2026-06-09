@@ -14,6 +14,10 @@ export class ObjectLayer implements CanvasLayer {
     this.objects.push(obj)
   }
 
+  public clear() {
+    this.objects = []
+  }
+
   remove(obj: GraphicObject) {
     this.objects = this.objects.filter(o => o !== obj)
   }
