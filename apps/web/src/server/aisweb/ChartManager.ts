@@ -3,6 +3,7 @@ import { expandBounds } from "./types"
 import { findVisibleCharts } from "@/app/utils/find-visible-charts"
 import { ChartLayer } from "@/app/engine/layers/ChartLayer"
 import { loadChart } from "./load-chart"
+import { CHART_ZOOM_THRESHOLD } from "../flight-plan/types"
 
 export class ChartManager {
 
@@ -16,6 +17,14 @@ export class ChartManager {
   async update(
   engine: CanvasEngine
 ) {
+  if (
+    engine.scale < CHART_ZOOM_THRESHOLD
+  ) {
+
+    // engine.removeLayersByPrefix("chart-")
+
+    return
+  }
 
   if (this.loading)
     return
@@ -34,7 +43,6 @@ export class ChartManager {
       findVisibleCharts(bounds)
 
     for (const chart of charts) {
-
       const layerId =
         `chart-${chart.id}`
 
@@ -47,13 +55,12 @@ export class ChartManager {
       const layer =
         new ChartLayer(chart)
 
-      engine.addLayerAt(0, layer)
+      engine.addChartLayer(layer)  
 
       let image =
         this.imageCache.get(chart.id)
 
       if (!image) {
-
         image =
           await loadChart(chart)
 

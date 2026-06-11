@@ -7,6 +7,8 @@ import { DistanceTool } from "../engine/tools/DistanceTool"
 import { PanTool } from "../engine/tools/PanTool"
 import { SelectionTool } from "../engine/tools/SelectionTool"
 import { ObjectLayer } from "../engine/layers/ObjectLayer"
+import { BaseMapLayer } from "../engine/layers/BaseMapLayer"
+import { BASEMAP_EXTENT } from "@/server/flight-plan/types"
 
 export function useCanvasEngine() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -18,11 +20,31 @@ export function useCanvasEngine() {
     const engine = new CanvasEngine(canvasRef.current)
     
     // ===== LAYERS =====
+    const baseMapLayer = new BaseMapLayer()
+
+    const img = new Image()
+    
+    img.onload = () => {
+      baseMapLayer.setImage(img)
+
+      engine.fitExtent(
+        BASEMAP_EXTENT.west,
+        BASEMAP_EXTENT.south,
+        BASEMAP_EXTENT.east,
+        BASEMAP_EXTENT.north
+      )
+
+      engine.render()
+    }
+
+    img.src = "/maps/brasil_osm_geo.png"
+
     const imageLayer = new ImageLayer()
     const objectLayer = new ObjectLayer()
     const crosshairLayer = new CrosshairLayer()
     const hudLayer = new HudLayer()
     
+    engine.addLayerAt(0, baseMapLayer)
     engine.addLayer(imageLayer)
     engine.addLayer(objectLayer)
     engine.addLayer(crosshairLayer)

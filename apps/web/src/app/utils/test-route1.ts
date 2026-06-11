@@ -17,6 +17,13 @@ import { drawFlightPlan } from "@/server/flight-plan/draw-flight-plan"
 export async function testRoute1(
   engine: CanvasEngine
 ) {
+  flightPlan.departure =
+    getAerodromeByIcao("SBSV")
+
+  flightPlan.arrival =
+    getAerodromeByIcao("SNJK")
+
+  await drawFlightPlan(engine, true)
 
   // engine.removeLayersByPrefix("chart-")
 
@@ -28,13 +35,13 @@ export async function testRoute1(
 
   // objectLayer.clear()
 
-  flightPlan.departure =
-    getAerodromeByIcao("SBSV")
+  // flightPlan.departure =
+  //   getAerodromeByIcao("SBSV")
 
-  flightPlan.arrival =
-    getAerodromeByIcao("SNJK")
+  // flightPlan.arrival =
+  //   getAerodromeByIcao("SNJK")
 
-  await drawFlightPlan(engine, true)  
+  // await drawFlightPlan(engine, true)  
 
   // =====================================
   // TODOS OS PONTOS DA ROTA

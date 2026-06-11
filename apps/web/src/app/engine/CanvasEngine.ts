@@ -12,6 +12,7 @@ import { findNearestAerodrome } from "../utils/find-nearest-aerodrome"
 import { ContextMenuInfo } from "./types/ContextMenu"
 import { findWaypointAtPosition } from "../utils/find-waypoint-at-position"
 import { Waypoint } from "@/server/flight-plan/types"
+import { geoToWorld } from "../utils/geo-to-world"
 
 export type ToolType =
   | "pan"
@@ -313,6 +314,72 @@ export class CanvasEngine {
     )
   }
 
+  public fitExtent(
+    west: number,
+    south: number,
+    east: number,
+    north: number,
+    padding = 100
+  ) {
+
+    const canvas =
+      this.getCanvas()
+
+    const nw =
+      geoToWorld(
+        north,
+        west
+      )
+
+    const se =
+      geoToWorld(
+        south,
+        east
+      )
+
+    const width =
+      Math.max(
+        100,
+        se.x - nw.x
+      )
+
+    const height =
+      Math.max(
+        100,
+        se.y - nw.y
+      )
+
+      //
+
+      //
+
+    const zoomX =
+      (canvas.width - padding * 2)
+      / width
+
+    const zoomY =
+      (canvas.height - padding * 2)
+      / height
+
+    const zoom =
+      Math.min(
+        0.8,
+        zoomX,
+        zoomY
+      )
+
+    const centerX =
+      (nw.x + se.x) / 2
+
+    const centerY =
+      (nw.y + se.y) / 2
+    this.centerAt(
+      centerX,
+      centerY,
+      zoom
+    )
+  }
+
   public fitRoute(
     start: { x: number; y: number },
     end: { x: number; y: number },
@@ -399,6 +466,30 @@ export class CanvasEngine {
 
   public getCanvas() {
     return this.canvas
+  }
+
+  public getLayerIndex(
+    id: string
+  ) {
+    return this.layers.findIndex(
+      layer => layer.id === id
+    )
+  }
+
+  public addChartLayer(
+    layer: CanvasLayer
+  ) {
+
+    const baseMapIndex =
+      this.layers.findIndex(
+        l => l.id === "basemap"
+      )
+
+    this.layers.splice(
+      baseMapIndex + 1,
+      0,
+      layer
+    )
   }
 
   // =========================
@@ -491,7 +582,15 @@ export class CanvasEngine {
     )
   }
 
+
   addLayer(layer: CanvasLayer) {
+    if (
+      layer.id === "basemap"
+    ) {
+      this.layers.unshift(layer)
+      return
+    }
+
     this.layers.push(layer)
   }
 
@@ -630,15 +729,6 @@ export class CanvasEngine {
     }
 
     // pan só se for pan tool
-    if (this.isDragging && this.activeTool?.id === "pan") {
-      const dx = e.clientX - this.lastPos.x
-      const dy = e.clientY - this.lastPos.y
-
-      this.offset.x += dx
-      this.offset.y += dy
-
-      this.lastPos = { x: e.clientX, y: e.clientY }
-    }
 
     const world =
       this.screenToWorld(
@@ -663,9 +753,8 @@ export class CanvasEngine {
       this.hoveredWaypoint
     ) {
       this.hoveredWaypoint = waypoint
-
-      this.render()
     }
+      this.render()
 
   }
 
@@ -674,16 +763,48 @@ export class CanvasEngine {
     this.isDragging = false
   }
 
-  private onWheel = (e: WheelEvent) => {
+  private onWheel = (
+    e: WheelEvent
+  ) => {
     e.preventDefault()
 
-    const zoomFactor = 0.1
-    const direction = e.deltaY > 0 ? -1 : 1
+    const rect =
+      this.canvas.getBoundingClientRect()
 
-    const newScale = this.scale + direction * zoomFactor * this.scale
-    this.scale = Math.max(0.1, Math.min(10, newScale))
+    const mouseX =
+      e.clientX - rect.left
 
+    const mouseY =
+      e.clientY - rect.top
+
+    const worldBefore =
+      this.screenToWorld(
+        mouseX,
+        mouseY
+      )
+
+    const factor =
+      e.deltaY > 0
+        ? 0.8
+        : 1.25
+
+    this.scale *= factor
+
+    const worldAfter =
+      this.screenToWorld(
+        mouseX,
+        mouseY
+      )
+
+    this.offset.x +=
+      (worldAfter.x - worldBefore.x)
+      * this.scale
+
+    this.offset.y +=
+      (worldAfter.y - worldBefore.y)
+      * this.scale
     this.render()
+
   }
 
   // =========================
@@ -739,7 +860,25 @@ export class CanvasEngine {
         typeof this.activeTool.drawOverlay === "function"
       ) {
         this.activeTool.drawOverlay(this.ctx, this)
-      }    
+      } 
+      
+      //
+for (const layer of this.layers) {
+
+  console.log(
+    "DRAW",
+    layer.id
+  )
+
+  if (layer.visible === false)
+    continue
+
+  if (layer.isUI)
+    continue
+
+  layer.draw(ctx, this)
+}
+      //
   }
 }
 

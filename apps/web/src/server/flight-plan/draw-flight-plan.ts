@@ -116,10 +116,7 @@ export async function drawFlightPlan(
     const layer =
         new ChartLayer(chart)
 
-    engine.addLayerAt(
-        0,
-        layer
-    )
+    engine.addChartLayer(layer)      
 
     const image =
         await loadChart(chart)
@@ -234,5 +231,6 @@ export async function drawFlightPlan(
       )
     }
 
-  engine.render()        
+  engine.render() 
+         
 }

@@ -1,8 +1,6 @@
 import { CanvasLayer } from "../types/CanvasLayer"
 import { CanvasEngine } from "../CanvasEngine"
 import { ChartMetadata } from "@/server/aisweb/types"
-// import { ChartMetadata } from "@/lib/navigation/types"
-
 export class ChartLayer implements CanvasLayer {
   id: string
   visible = true

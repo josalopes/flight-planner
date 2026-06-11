@@ -28,10 +28,10 @@ export class PanTool implements Tool{
 
     engine.render()
 
-    await engine.chartManager.update(engine)
   }
-
-  onMouseUp() {
+  
+  async onMouseUp(engine: CanvasEngine) {
     this.isDragging = false
+    await engine.chartManager.update(engine)
   }
 }

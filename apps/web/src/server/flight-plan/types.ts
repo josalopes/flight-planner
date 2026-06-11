@@ -43,16 +43,11 @@ export interface FlightLeg {
   trueCourse: number
 }
 
-// export class AerodromeStore {
+export const BASEMAP_EXTENT = {
+  west: -102.83338516900395,
+  south: -42.16181763339097,
+  east: -15.288304326921406,
+  north: 13.892226934561162
+}
 
-//   private airports: Aerodrome[] = []
-
-//   async load() {
-//     this.airports =
-//       await getAllAerodromes()
-//   }
-
-//   getAll() {
-//     return this.airports
-//   }
-// }
+export const CHART_ZOOM_THRESHOLD = 0.7

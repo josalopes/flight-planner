@@ -19,22 +19,3 @@ export async function loadChart(
     }
   )
 }
-// export async function loadChart(
-//   chart: ChartMetadata,
-//   imageLayer: ImageLayer
-// ): Promise<HTMLImageElement> {
-
-//   return new Promise((resolve) => {
-
-//     const img = new Image()
-
-//     img.onload = () => {
-//       imageLayer.setImage(img)
-
-//       resolve(img)
-//     }
-
-//     img.src = chart.imageUrl
-
-//   })
-// }
