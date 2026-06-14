@@ -11,8 +11,9 @@ import { worldToLatLon } from "../utils/world-to-latlon"
 import { findNearestAerodrome } from "../utils/find-nearest-aerodrome"
 import { ContextMenuInfo } from "./types/ContextMenu"
 import { findWaypointAtPosition } from "../utils/find-waypoint-at-position"
-import { Waypoint } from "@/server/flight-plan/types"
+import { Aerodrome, BASEMAP_EXTENT, Waypoint } from "@/server/flight-plan/types"
 import { geoToWorld } from "../utils/geo-to-world"
+import { ChartLayer } from "./layers/ChartLayer"
 
 export type ToolType =
   | "pan"
@@ -48,6 +49,8 @@ export class CanvasEngine {
   public isShiftPressed = false
   public previousCursor = { x:0, y:0 }
   public hoveredWaypoint: Waypoint | null = null
+  public hasFlightPlan = false
+  pendingDeparture: Aerodrome | null = null
 
   constructor(canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext("2d")
@@ -416,9 +419,13 @@ export class CanvasEngine {
       routeHeight
 
     const zoom =
-      Math.min(0.8,
-        zoomX,
-        zoomY
+      Math.max(
+        0.6,
+        Math.min(
+          0.8,
+          zoomX,
+          zoomY
+        )
       )
 
     const centerX =
@@ -431,6 +438,75 @@ export class CanvasEngine {
       centerX,
       centerY,
       zoom
+    )
+  }
+
+  public zoomToChart(
+    chart: ChartMetadata,
+    zoom = 0.6
+  ) {
+
+    const centerLat =
+      (chart.north +
+      chart.south) / 2
+
+    const centerLon =
+      (chart.west +
+      chart.east) / 2
+
+    const point =
+      geoToWorld(
+        centerLat,
+        centerLon
+      )
+
+    this.centerAt(
+      point.x,
+      point.y,
+      zoom
+    )
+  }
+
+  public fitCharts(
+    charts: ChartMetadata[],
+    padding = 100
+  ) {
+    if (charts.length === 0)
+      return
+
+    let west = Infinity
+    let south = Infinity
+    let east = -Infinity
+    let north = -Infinity
+
+    for (const chart of charts) {
+      west = Math.min(
+        west,
+        chart.west
+      )
+
+      south = Math.min(
+        south,
+        chart.south
+      )
+
+      east = Math.max(
+        east,
+        chart.east
+      )
+
+      north = Math.max(
+        north,
+        chart.north
+      )
+    }
+
+    this.fitExtent(
+      west,
+      south,
+      east,
+      north,
+      padding
     )
   }
 
@@ -575,11 +651,17 @@ export class CanvasEngine {
     this.render()
   }
 
-  removeLayer(id: string) {
+  public removeLayer(
+    id: string
+  ) {
+
     this.layers =
       this.layers.filter(
-        layer => layer.id !== id
-    )
+        layer =>
+          layer.id !== id
+      )
+
+    this.render()
   }
 
 
@@ -596,6 +678,51 @@ export class CanvasEngine {
 
   getLayer<T extends CanvasLayer>(id: string): T | undefined {
     return this.layers.find(l => l.id === id) as T | undefined
+  }
+
+  public getLayers() {
+    return this.layers
+  }
+
+  public hasChartLayers(): boolean {
+    return this.layers.some(
+      layer =>
+        layer.id.startsWith(
+          "chart-"
+        )
+    )
+  }
+
+  public resetToBaseMap() {
+    this.fitExtent(
+      BASEMAP_EXTENT.west,
+      BASEMAP_EXTENT.south,
+      BASEMAP_EXTENT.east,
+      BASEMAP_EXTENT.north
+    )
+  }
+
+
+  public getChartAtPosition(
+    lat: number,
+    lon: number
+  ): ChartLayer | undefined {
+
+    const chartLayers =
+      this.layers.filter(
+        layer =>
+          layer instanceof ChartLayer
+      ) as ChartLayer[]
+
+    return chartLayers
+      .reverse()
+      .find(
+        layer =>
+          layer.containsLatLon(
+            lat,
+            lon
+          )
+      )
   }
 
   // =========================
@@ -803,6 +930,9 @@ export class CanvasEngine {
     this.offset.y +=
       (worldAfter.y - worldBefore.y)
       * this.scale
+
+    void this.chartManager.update(this)
+
     this.render()
 
   }
@@ -862,23 +992,6 @@ export class CanvasEngine {
         this.activeTool.drawOverlay(this.ctx, this)
       } 
       
-      //
-for (const layer of this.layers) {
-
-  console.log(
-    "DRAW",
-    layer.id
-  )
-
-  if (layer.visible === false)
-    continue
-
-  if (layer.isUI)
-    continue
-
-  layer.draw(ctx, this)
-}
-      //
   }
 }
 

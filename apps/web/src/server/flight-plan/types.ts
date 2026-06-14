@@ -50,4 +50,4 @@ export const BASEMAP_EXTENT = {
   north: 13.892226934561162
 }
 
-export const CHART_ZOOM_THRESHOLD = 0.7
+export const CHART_ZOOM_THRESHOLD = 0.10

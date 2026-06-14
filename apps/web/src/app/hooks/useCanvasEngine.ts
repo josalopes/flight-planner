@@ -9,23 +9,34 @@ import { SelectionTool } from "../engine/tools/SelectionTool"
 import { ObjectLayer } from "../engine/layers/ObjectLayer"
 import { BaseMapLayer } from "../engine/layers/BaseMapLayer"
 import { BASEMAP_EXTENT } from "@/server/flight-plan/types"
+import { useCanvasEngineContext } from "../contexts/canvas-engine-context"
 
 export function useCanvasEngine() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const engineRef = useRef<CanvasEngine | null>(null)
+  const {setEngine} = useCanvasEngineContext()
   
   useEffect(() => {
     if (!canvasRef.current) return
     
     const engine = new CanvasEngine(canvasRef.current)
+    engineRef.current = engine
+    setEngine(engine)
     
     // ===== LAYERS =====
     const baseMapLayer = new BaseMapLayer()
 
     const img = new Image()
-    
     img.onload = () => {
+      console.log("imagem carregada")
       baseMapLayer.setImage(img)
+      
+      canvasRef.current!.width =
+        canvasRef.current!.clientWidth
+
+      canvasRef.current!.height =
+        canvasRef.current!.clientHeight
+      
 
       engine.fitExtent(
         BASEMAP_EXTENT.west,

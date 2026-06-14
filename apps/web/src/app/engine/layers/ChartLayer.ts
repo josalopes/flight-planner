@@ -5,6 +5,7 @@ export class ChartLayer implements CanvasLayer {
   id: string
   visible = true
   isUI = false
+  isRouteChart = false
 
   private image: HTMLImageElement | null = null
 
@@ -17,6 +18,18 @@ export class ChartLayer implements CanvasLayer {
   setImage(img: HTMLImageElement) {
     this.image = img
   }
+
+  containsLatLon(
+      lat: number,
+      lon: number
+    ) {
+      return (
+        lon >= this.chart.west &&
+        lon <= this.chart.east &&
+        lat >= this.chart.south &&
+        lat <= this.chart.north
+      )
+    }
 
   draw(
     ctx: CanvasRenderingContext2D,

@@ -101,27 +101,28 @@ export async function drawFlightPlan(
     // =====================================
 
     for (
-    const chart
-    of chartsMap.values()
+      const chart
+      of chartsMap.values()
     ) {
+      if (
+          engine.getLayer(
+          `chart-${chart.id}`
+          )
+      ) {
+          continue
+      }
 
-    if (
-        engine.getLayer(
-        `chart-${chart.id}`
-        )
-    ) {
-        continue
-    }
+      const layer = new ChartLayer(chart)
+      layer.isRouteChart = true
 
-    const layer =
-        new ChartLayer(chart)
+      engine.addChartLayer(layer)      
 
-    engine.addChartLayer(layer)      
+      const image =
+          await loadChart(chart)
 
-    const image =
-        await loadChart(chart)
+      layer.setImage(image)
 
-    layer.setImage(image)
+      engine.hasFlightPlan = true
     }
     
     // =====================================

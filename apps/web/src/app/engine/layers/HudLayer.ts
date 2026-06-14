@@ -34,11 +34,14 @@ export class HudLayer implements CanvasLayer {
         "lon"
     )  
 
-    const chart =
-      findChartByLatLon(
+    const chartLayer =
+      engine.getChartAtPosition(
         pos.lat,
         pos.lon
-    )
+      )
+
+    const chart =
+      chartLayer?.chart
 
     ctx.save()
 

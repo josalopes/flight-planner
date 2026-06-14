@@ -17,12 +17,13 @@ export class ChartManager {
   async update(
   engine: CanvasEngine
 ) {
+  if (!engine.hasFlightPlan) {
+    return
+  }
+    
   if (
     engine.scale < CHART_ZOOM_THRESHOLD
   ) {
-
-    // engine.removeLayersByPrefix("chart-")
-
     return
   }
 
