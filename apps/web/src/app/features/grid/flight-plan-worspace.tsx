@@ -37,18 +37,18 @@ export default function FlightPlannerWorkspace() {
   /* ========= STATES ============ */
   /* ============================= */
 
-  const [spacing, setSpacing] = useState(1)
-  const [thickness, setThickness] = useState(1)
-  const [color, setColor] = useState("#000000")
-  const [dpi, setDpi] = useState(96)
-  const [paperSize, setPaperSize] = useState("A4")
-  const [orientation, setOrientation] = useState("portrait")
-  const [showSubdivisions, setShowSubdivisions] = useState(false)
-  const [showMainGrid, setShowMainGrid] = useState(false)
-  const [showCrosshair, setShowCrosshair] = useState(true)
-  const [contextMenu, setContextMenu] = useState<any>(null)
+  // const [spacing, setSpacing] = useState(1)
+  // const [thickness, setThickness] = useState(1)
+  // const [color, setColor] = useState("#000000")
+  // const [dpi, setDpi] = useState(96)
+  // const [paperSize, setPaperSize] = useState("A4")
+  // const [orientation, setOrientation] = useState("portrait")
+  // const [showSubdivisions, setShowSubdivisions] = useState(false)
+  // const [showMainGrid, setShowMainGrid] = useState(false)
+  // const [showCrosshair, setShowCrosshair] = useState(true)
+  // const fileInputRef = useRef<HTMLInputElement | null>(null)
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const [contextMenu, setContextMenu] = useState<any>(null)
   const { canvasRef, engine } = useCanvasEngine()
 
   useEffect(() => {
@@ -116,13 +116,13 @@ export default function FlightPlannerWorkspace() {
     img.src = URL.createObjectURL(file)
   }
   
-  const toggleCrosshair = () => {
-    const layer = engine.current?.getLayer<CrosshairLayer>("crosshair")
-    if (!layer) return
-    layer.visible = !layer.visible
-    engine.current?.render()
-    setShowCrosshair(!showCrosshair)
-  }
+  // const toggleCrosshair = () => {
+  //   const layer = engine.current?.getLayer<CrosshairLayer>("crosshair")
+  //   if (!layer) return
+  //   layer.visible = !layer.visible
+  //   engine.current?.render()
+  //   setShowCrosshair(!showCrosshair)
+  // }
 
   const handleUnitChange = (unit: RulerUnit) => {
     if (!engine.current) return
@@ -135,30 +135,30 @@ export default function FlightPlannerWorkspace() {
   /* ===== GRID CONFIG UPDATE ==== */
   /* ============================= */
 
-  useEffect(() => {
-    const eng = engine.current
-    if (!eng) return
+  // useEffect(() => {
+  //   const eng = engine.current
+  //   if (!eng) return
 
-    const gridLayer = eng.getLayer<GridLayer>("grid")
-    if (!gridLayer) return
+  //   const gridLayer = eng.getLayer<GridLayer>("grid")
+  //   if (!gridLayer) return
 
-    gridLayer.spacingUnits = spacing
-    eng.render()
+  //   gridLayer.spacingUnits = spacing
+  //   eng.render()
 
-    gridLayer.color = color
-    gridLayer.thickness = thickness
-    gridLayer.showMainGrid = showMainGrid
-    gridLayer.showSubdivisions = showSubdivisions
+  //   gridLayer.color = color
+  //   gridLayer.thickness = thickness
+  //   gridLayer.showMainGrid = showMainGrid
+  //   gridLayer.showSubdivisions = showSubdivisions
 
-    eng.render()
-  }, [
-    spacing,
-    thickness,
-    color,
-    dpi,
-    showMainGrid,
-    showSubdivisions
-  ])
+  //   eng.render()
+  // }, [
+  //   spacing,
+  //   thickness,
+  //   color,
+  //   dpi,
+  //   showMainGrid,
+  //   showSubdivisions
+  // ])
 
   async function handleLoadMap() {
     if (!engine.current) return

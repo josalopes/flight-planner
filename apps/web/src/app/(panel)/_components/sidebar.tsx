@@ -1,48 +1,26 @@
 "use client";
 
-import Image from "next/image";
-import { useState, useTransition } from "react";
-import { usePathname, useRouter } from "next/navigation"
+import { useState } from "react";
 import clsx from "clsx";
 
 import { 
-    Banknote, 
-    CalendarCheck2, 
     ChevronLeft, 
-    ChevronDown,
     ChevronRight,
-    Map, 
-    Folder, 
-    List, 
-    Settings,
-    UserPen,
-    Users, Store,
-    Warehouse,
-    Feather
- } from "lucide-react";
+    List
+     } from "lucide-react";
 
 import {
     Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
 
 import {
     Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger
-} from "@/components/ui/collapsible"
+    CollapsibleContent} from "@/components/ui/collapsible"
 
 import { Button } from "@/components/ui/button";
 
-import { SidebarActionButton } from "./sidebar_action_button";
-import { SidebarNavLink } from "./sidebar_nav_link";
 
-import { Checkbox } from "@/components/ui/checkbox"
-import { ChartLayer } from "@/app/engine/layers/ChartLayer";
-import { loadChart } from "@/server/aisweb/load-chart";
 import { ChartSelector } from "./chart-selector";
 
 
@@ -68,7 +46,19 @@ export function SidebarDashboardClient({ children }: { children: React.ReactNode
 
         <Collapsible open={!isCollapsed}>
           <CollapsibleContent>
-              <ChartSelector />
+          <div
+            className="
+              flex
+              flex-col
+              gap-2
+              mt-2
+              max-h-[60vh]
+              overflow-y-auto
+              pr-2
+            "
+          >
+            <ChartSelector />
+          </div>
           </CollapsibleContent>
         </Collapsible>
       </aside>

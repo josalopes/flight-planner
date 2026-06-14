@@ -9,12 +9,12 @@ import { loadChart } from "@/server/aisweb/load-chart"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { ChevronDown, ChevronRight } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
-import { geoToWorld } from "@/app/utils/geo-to-world"
 
 export function ChartSelector() {
   const [open, setOpen] = useState(false)
   const [selectedCharts, setSelectedCharts] = useState<string[]>([])
   const { engine } = useCanvasEngineContext()
+  const allChartsSelected = selectedCharts.length === CHART_CATALOGUE.length
 
   async function handleToggle(
     chartId: string,
@@ -80,15 +80,11 @@ export function ChartSelector() {
       if (
         remainingCharts.length === 0
       ) {
-
         engine.resetToBaseMap()
-
       } else {
-
         engine.fitCharts(
           remainingCharts
         )
-
       }  
 
       if (
@@ -100,6 +96,67 @@ export function ChartSelector() {
 
     engine.render()
   }
+
+  async function handleToggleAll(
+    checked: boolean
+  ) {
+    if (!engine) return
+
+    if (checked) {
+      setSelectedCharts(
+        CHART_CATALOGUE.map(
+          chart => chart.id
+        )
+      )
+
+      for (
+        const chart
+        of CHART_CATALOGUE
+      ) {
+        if (
+          engine.getLayer(
+            `chart-${chart.id}`
+          )
+        ) {
+          continue
+        }
+
+        const layer = new ChartLayer(chart)
+        engine.addLayerAt(1, layer)
+
+        const image = await loadChart(chart)
+        layer.setImage(image)
+      }      
+    } else {
+      setSelectedCharts([])
+      
+      for (
+        const chart
+        of CHART_CATALOGUE
+      ) {
+        const layer =
+          engine.getLayer(
+            `chart-${chart.id}`
+          ) as ChartLayer
+
+        if (
+          layer?.isRouteChart
+        ) {
+          continue
+        }
+
+        engine.removeLayer(
+          `chart-${chart.id}`
+        )
+      }
+
+      // setSelectedCharts([])
+
+      engine.resetToBaseMap()
+    }
+    engine.render()
+  }
+
   return (
     <Collapsible
       open={open}
@@ -129,7 +186,22 @@ export function ChartSelector() {
         }
       </CollapsibleTrigger>
 
+
       <CollapsibleContent>
+        <div className="flex items-center gap-2 mb-2">
+          <Checkbox
+            checked={allChartsSelected}
+            onCheckedChange={
+              handleToggleAll
+            }
+          />
+
+          <span>
+            Todas
+          </span>
+        </div>
+        <hr className="mb-2" />
+
         <div className="flex flex-col gap-2 mt-2">
           {          
             [...CHART_CATALOGUE]
