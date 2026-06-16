@@ -1,4 +1,5 @@
 import { Aerodrome, Waypoint } from "@/server/flight-plan/types"
+import { RouteObject } from "../objects/RouteObject"
 
 export interface ContextMenuInfo {
   screenX: number
@@ -9,4 +10,7 @@ export interface ContextMenuInfo {
 
   airport?: Aerodrome
   waypoint?: Waypoint
+
+  legIndex?: number
+  route?: RouteObject
 }

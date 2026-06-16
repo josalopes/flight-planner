@@ -1,4 +1,4 @@
-import FlightPlannerWorkspace from "./features/grid/flight-plan-worspace";
+import FlightPlannerWorkspace from "./features/grid/flight-plan-workspace";
 
 export default function Home() {
   return (

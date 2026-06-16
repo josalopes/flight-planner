@@ -10,9 +10,7 @@ export class WaypointObject
   implements GraphicObject {
 
   id = crypto.randomUUID()
-
   type = "waypoint"
-
   selected = false
 
   constructor(
@@ -20,7 +18,9 @@ export class WaypointObject
     public label: string,
     public waypointType:
       | "AERODROME"
-      | "USER",
+      | "USER"
+      | "DEPARTURE"
+      | "ARRIVAL",
     public waypointId: string
   ) {}
 
@@ -83,10 +83,28 @@ export class WaypointObject
       ctx.closePath()
     }
 
-    ctx.fillStyle =
-    this.selected
-      ? "#ff0000"
-      : "#00aa00"
+    if (
+      this.waypointType ===
+      "DEPARTURE"
+    ) {
+
+      ctx.fillStyle = "#0066ff"
+
+    } else if (
+      this.waypointType ===
+      "ARRIVAL"
+    ) {
+
+      ctx.fillStyle = "#ff0000"
+
+    } else {
+
+      ctx.fillStyle =
+        this.selected
+          ? "#ff0000"
+          : "#00aa00"
+
+    }
 
     ctx.fill()
 

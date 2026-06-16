@@ -10,6 +10,7 @@ import { ObjectLayer } from "../engine/layers/ObjectLayer"
 import { BaseMapLayer } from "../engine/layers/BaseMapLayer"
 import { BASEMAP_EXTENT } from "@/server/flight-plan/types"
 import { useCanvasEngineContext } from "../contexts/canvas-engine-context"
+import { AerodromeHoverLayer } from "../engine/layers/AerodromeHoverLayer"
 
 export function useCanvasEngine() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -28,7 +29,6 @@ export function useCanvasEngine() {
 
     const img = new Image()
     img.onload = () => {
-      console.log("imagem carregada")
       baseMapLayer.setImage(img)
       
       canvasRef.current!.width =
@@ -49,16 +49,18 @@ export function useCanvasEngine() {
     }
 
     img.src = "/maps/brasil_osm_geo.png"
-
+    
+    const aerodromeHoverLayer = new AerodromeHoverLayer()
     const imageLayer = new ImageLayer()
     const objectLayer = new ObjectLayer()
     const crosshairLayer = new CrosshairLayer()
     const hudLayer = new HudLayer()
-    
+
     engine.addLayerAt(0, baseMapLayer)
     engine.addLayer(imageLayer)
     engine.addLayer(objectLayer)
     engine.addLayer(crosshairLayer)
+    engine.addLayer(aerodromeHoverLayer)
     engine.addLayer(hudLayer)
 
     // ===== TOOLS =====

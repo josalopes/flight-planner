@@ -15,20 +15,20 @@ export async function drawFlightPlan(
   engine: CanvasEngine,
   fit = false
 ) {
-
-    const objectLayer =
-    engine.getLayer<ObjectLayer>("objects")
+    const objectLayer = engine.getLayer<ObjectLayer>("objects")
 
     if (!objectLayer) return
+    
+    objectLayer.clear()
 
     if (
       !flightPlan.departure ||
       !flightPlan.arrival
       ) {
-        return
+          engine.render()
+          return
         }
 
-    objectLayer.clear()
 
     // =====================================
     // TODOS OS PONTOS DA ROTA
@@ -38,7 +38,6 @@ export async function drawFlightPlan(
       lat: number
       lon: number
     }
-    
     const routePoints: RoutePoint[] = [ 
       {
         lat: flightPlan.departure.lat,
@@ -204,8 +203,9 @@ export async function drawFlightPlan(
         new RouteObject(
           start,
           end,
+          i,
           distanceNm,
-          routeBearing
+          routeBearing,
         )
       )
     }

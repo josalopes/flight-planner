@@ -5,7 +5,7 @@ import { Tool } from "../types/Tool"
 
 export class PanTool implements Tool{
   id = "pan"
-  cursor = "grab"
+  cursor = "default"
 
   private isDragging = false
   private lastPos = { x: 0, y: 0 }

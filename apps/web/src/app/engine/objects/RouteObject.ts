@@ -10,22 +10,16 @@ interface Point {
 
 export class RouteObject implements GraphicObject {
   id = crypto.randomUUID()
-
   type = "route"
-
   selected = false
 
   constructor(
     public start: Point,
     public end: Point,
-    // public label?: string,
+    public legIndex: number,
     public distanceNm?: number,
-    public bearing?: number
+    public bearing?: number,
   ) {}
-
-  
-
-  
 
   draw(
     ctx: CanvasRenderingContext2D,
@@ -39,15 +33,27 @@ export class RouteObject implements GraphicObject {
 
     ctx.beginPath()
 
+    const hovered =
+      engine.hoveredRoute === this
+
     ctx.strokeStyle =
-      this.selected
-        ? "#ff0000"
+      hovered
+        ? "#ffff00"
         : "#ff00ff"
 
     ctx.lineWidth =
-      this.selected
-        ? 3 / engine.scale
+      hovered
+        ? 4 / engine.scale
         : 2 / engine.scale
+    // ctx.strokeStyle =
+    //   this.selected
+    //     ? "#ff0000"
+    //     : "#ff00ff"
+
+    // ctx.lineWidth =
+    //   this.selected
+    //     ? 3 / engine.scale
+    //     : 2 / engine.scale
 
     ctx.moveTo(
       this.start.x,

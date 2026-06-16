@@ -26,14 +26,14 @@ export interface FlightPlan {
   waypoints: Waypoint[]
 }
 
-export interface ContextMenuInfo {
-  screenX: number
-  screenY: number
-  lat: number
-  lon: number
-  airport?: Aerodrome
-  waypoint?: Waypoint
-}
+// export interface ContextMenuInfo {
+//   screenX: number
+//   screenY: number
+//   lat: number
+//   lon: number
+//   airport?: Aerodrome
+//   waypoint?: Waypoint
+// }
 
 export interface FlightLeg {
   origin: Aerodrome

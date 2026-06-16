@@ -3,6 +3,7 @@
 import { CanvasLayer } from "../types/CanvasLayer"
 import { CanvasEngine } from "../CanvasEngine"
 import { GraphicObject } from "../objects/GraphicObject"
+import { RouteObject } from "../objects/RouteObject"
 
 export class ObjectLayer implements CanvasLayer {
   id = "objects"
@@ -20,6 +21,17 @@ export class ObjectLayer implements CanvasLayer {
 
   remove(obj: GraphicObject) {
     this.objects = this.objects.filter(o => o !== obj)
+  }
+
+  getObjects() {
+    return this.objects
+  }
+
+  getRouteObjects() {
+    return this.objects.filter(
+      object =>
+        object instanceof RouteObject
+    ) as RouteObject[]
   }
 
   getAll() {

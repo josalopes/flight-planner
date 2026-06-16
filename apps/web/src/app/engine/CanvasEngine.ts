@@ -14,6 +14,8 @@ import { findWaypointAtPosition } from "../utils/find-waypoint-at-position"
 import { Aerodrome, BASEMAP_EXTENT, Waypoint } from "@/server/flight-plan/types"
 import { geoToWorld } from "../utils/geo-to-world"
 import { ChartLayer } from "./layers/ChartLayer"
+import { RouteObject } from "./objects/RouteObject"
+import { ObjectLayer } from "./layers/ObjectLayer"
 
 export type ToolType =
   | "pan"
@@ -49,6 +51,8 @@ export class CanvasEngine {
   public isShiftPressed = false
   public previousCursor = { x:0, y:0 }
   public hoveredWaypoint: Waypoint | null = null
+  public hoveredAerodrome: Aerodrome | null = null
+  public hoveredRoute: RouteObject | null = null
   public hasFlightPlan = false
   pendingDeparture: Aerodrome | null = null
 
@@ -62,6 +66,9 @@ export class CanvasEngine {
     this.attachEvents()
     this.attachKeyboard()
   }
+  
+   public onContextMenu?:
+      (info: ContextMenuInfo) => void
 
   public executeCommand(command: Command) {
     command.execute()
@@ -602,8 +609,7 @@ export class CanvasEngine {
     // EXPORT PDF
     // =========================
 
-    public onContextMenu?:
-      (info: ContextMenuInfo) => void
+   
 
     public exportPDF = (paperSize: string, orientation: "portrait" | "landscape") => {
       const pdf = new jsPDF({
@@ -759,6 +765,29 @@ export class CanvasEngine {
         world.y
       )
 
+    if (this.hoveredRoute) {
+      //
+console.log(
+    "ROUTE SELECTED",
+    this.hoveredRoute.legIndex
+  )
+
+      //
+      this.onContextMenu?.({
+        screenX: event.clientX,
+        screenY: event.clientY,
+
+        lat: position.lat,
+        lon: position.lon,
+
+        legIndex: this.hoveredRoute.legIndex,
+
+        route: this.hoveredRoute
+      })
+
+      return
+    }  
+
     const waypoint =
       findWaypointAtPosition(
         position.lat,
@@ -783,7 +812,7 @@ export class CanvasEngine {
       findNearestAerodrome(
         position.lat,
         position.lon,
-        5
+        15
     ) 
 
     if (airport) {
@@ -846,16 +875,12 @@ export class CanvasEngine {
 
     this.previousCursor = { ...this.cursor }
 
-    // atualizar cursor SEMPRE
     this.cursor.x = (screenX - this.offset.x) / this.scale
     this.cursor.y = (screenY - this.offset.y) / this.scale
 
-    // ferramenta tem prioridade
     if (this.activeTool?.onMouseMove) {
       this.activeTool.onMouseMove(this, e)
     }
-
-    // pan só se for pan tool
 
     const world =
       this.screenToWorld(
@@ -869,6 +894,13 @@ export class CanvasEngine {
         world.y
     )
 
+    this.hoveredAerodrome =
+      findNearestAerodrome(
+        position.lat,
+        position.lon,
+        8
+      )
+
     const waypoint =
       findWaypointAtPosition(
         position.lat,
@@ -881,8 +913,36 @@ export class CanvasEngine {
     ) {
       this.hoveredWaypoint = waypoint
     }
-      this.render()
 
+    const objectLayer =
+      this.getLayer<ObjectLayer>(
+        "objects"
+      )
+
+    this.hoveredRoute = null
+
+    if (objectLayer) {
+      for (
+        const route
+        of objectLayer.getRouteObjects()
+      ) {
+
+        if (
+          route.hitTest(
+            world,
+            50 / this.scale
+          )
+        ) {
+
+          this.hoveredRoute =
+            route
+
+          break
+        }
+      }
+    }
+   
+    this.render()
   }
 
   private onMouseUp = (e: MouseEvent) => {

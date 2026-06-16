@@ -9,9 +9,6 @@ export function findNearestAerodrome(
 ) {
 
   let nearest: Aerodrome | null = null
-  // let nearest:
-  //   | typeof aerodromes[number]
-  //   | null = null
 
   let minDistance = Infinity
 
