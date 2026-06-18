@@ -1,9 +1,11 @@
-import { flightPlan } from "./store"
+import { flightPlan, notifyFlightPlanChanged } from "./store"
 
 export function clearFlightPlan() {
 
   flightPlan.departure = null
   flightPlan.arrival = null
   flightPlan.waypoints = []
+
+  notifyFlightPlanChanged()
   
 }

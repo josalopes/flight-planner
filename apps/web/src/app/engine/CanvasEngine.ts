@@ -201,10 +201,22 @@ export class CanvasEngine {
     this.tools.set(tool.id, tool)
   }
 
-  public setTool(id: string) {
-    this.activeTool = this.tools.get(id) ?? null
-    this.updateCursorStyle()
+  setTool(id: string) {
+    const tool =
+      this.tools.get(id)
+
+    if (!tool)
+      return
+
+    this.activeTool = tool
+
+    this.canvas.style.cursor =
+      tool.cursor ?? "default"
   }
+  // public setTool(id: string) {
+  //   this.activeTool = this.tools.get(id) ?? null
+  //   this.updateCursorStyle()
+  // }
 
   public getPixelsPerUnit() {
     switch (this.unit) {
@@ -743,6 +755,8 @@ export class CanvasEngine {
     canvas.addEventListener("mouseup", this.onMouseUp)
     canvas.addEventListener("mouseleave", this.onMouseUp)
     canvas.addEventListener("wheel", this.onWheel, { passive: false })
+    canvas.addEventListener("keydown", this.onKeyDown)
+    canvas.addEventListener("keyup", this.onKeyUp)
     canvas.addEventListener("contextmenu", this.handleContextMenu)
   } 
   
@@ -766,13 +780,6 @@ export class CanvasEngine {
       )
 
     if (this.hoveredRoute) {
-      //
-console.log(
-    "ROUTE SELECTED",
-    this.hoveredRoute.legIndex
-  )
-
-      //
       this.onContextMenu?.({
         screenX: event.clientX,
         screenY: event.clientY,
@@ -791,7 +798,8 @@ console.log(
     const waypoint =
       findWaypointAtPosition(
         position.lat,
-        position.lon
+        position.lon,
+        15
       ) 
 
     if (waypoint) {
@@ -850,6 +858,21 @@ console.log(
       y:
         (screenY - this.offset.y) /
         this.scale
+    }
+  }
+
+  public worldToScreen(
+    worldX: number,
+    worldY: number
+  ) {
+    return {
+      x:
+        worldX * this.scale +
+        this.offset.x,
+
+      y:
+        worldY * this.scale +
+        this.offset.y
     }
   }
 

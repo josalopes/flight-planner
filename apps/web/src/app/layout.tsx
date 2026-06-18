@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { SidebarDashboardClient } from "./(panel)/_components/sidebar";
+import { SidebarDashboardClient } from "../components/sidebar";
 import { CanvasEngineProvider } from "./contexts/canvas-engine-provider";
+import { FlightPlanProvider } from "./contexts/flight-plan-provider";
 
 export const metadata: Metadata = {
   title: "Flight Planner",
@@ -19,9 +20,11 @@ export default function RootLayout({
     >
       <body>
         <CanvasEngineProvider>
-          <SidebarDashboardClient>
-            {children}
-          </SidebarDashboardClient>
+          <FlightPlanProvider>
+            <SidebarDashboardClient>
+              {children}
+            </SidebarDashboardClient>
+          </FlightPlanProvider>
         </CanvasEngineProvider>
       </body>
     </html>

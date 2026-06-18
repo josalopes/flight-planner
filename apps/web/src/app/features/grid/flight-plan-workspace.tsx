@@ -5,7 +5,7 @@ import { useCanvasEngine } from "../../hooks/useCanvasEngine"
 import { CanvasViewer } from "../../components/canvas-viewer"
 
 import { testRoute1 } from "@/app/utils/test-route1"
-import { flightPlan } from "@/server/flight-plan/store"
+import { flightPlan, notifyFlightPlanChanged } from "@/server/flight-plan/store"
 import { drawFlightPlan } from "@/server/flight-plan/draw-flight-plan"
 import { ObjectLayer } from "@/app/engine/layers/ObjectLayer"
 import { latLonToWorld } from "@/app/utils/latlon-to-world"
@@ -24,18 +24,16 @@ export default function FlightPlannerWorkspace() {
   const [contextMenu, setContextMenu] = useState<any>(null)
   const { canvasRef, engine } = useCanvasEngine()
 
+  const hasRoute =
+    !!flightPlan.departure &&
+    !!flightPlan.arrival
+
   useEffect(() => {
     if (!engine.current)
       return
 
     engine.current.onContextMenu =
       async info => {
-        //
- console.log(
-      "CONTEXT MENU INFO",
-      info
-    )
-        //
         if (info.route) {
           setContextMenu(info)
           return
@@ -43,13 +41,14 @@ export default function FlightPlannerWorkspace() {
         
         if (info.waypoint) {
           setContextMenu(info)
+
           return
         }
 
         if (info.airport) {
           if (!flightPlan.departure) {
-            flightPlan.departure =
-              info.airport
+            flightPlan.departure = info.airport
+            notifyFlightPlanChanged()
 
             const objectLayer =
               engine.current!
@@ -88,8 +87,8 @@ export default function FlightPlannerWorkspace() {
               return
             }
 
-            flightPlan.arrival =
-              info.airport
+            flightPlan.arrival = info.airport
+            notifyFlightPlanChanged()
 
             await drawFlightPlan(
               engine.current!,
@@ -99,36 +98,19 @@ export default function FlightPlannerWorkspace() {
             return
           }
 
-          const exists =
-            flightPlan.waypoints.some(
-              wp =>
-                wp.icao ===
-                info.airport?.icao
-            )
+          setContextMenu(info)
+          return
 
-          if (!exists) {
-            flightPlan.waypoints.push({
-              id: crypto.randomUUID(),
-              name: info.airport.name,
-              icao: info.airport.icao,
-              lat: info.airport.lat,
-              lon: info.airport.lon,
-              type: "AERODROME"
-            })
-            //
-            // removeLeg(contextMenu.legIndex)
-            //
-
-            await drawFlightPlan(
-              engine.current!,
-              false
-            )
-          }
+        }
+        if (
+          !info.airport &&
+          !info.waypoint &&
+          !info.route
+        ) {
+          setContextMenu(info)
 
           return
-        }
-
-        setContextMenu(info)
+        }          
       }
   }, [engine])
 
@@ -227,12 +209,11 @@ export default function FlightPlannerWorkspace() {
                         hover:bg-gray-100
                       "
                       onClick={async () => {
-                        // e => e.stopProgagation()
                         const exists =
                           flightPlan.waypoints.some(
                             wp =>
-                              wp.icao === "AERODROME" &&
-                              contextMenu.airport.icao
+                              wp.type === "AERODROME" &&
+                              wp.icao === contextMenu.airport.icao
                           )
 
                         if (!exists) {
@@ -276,16 +257,13 @@ export default function FlightPlannerWorkspace() {
 
                     <button
                       onClick={async () => {
-                        // e => e.stopProgagation()
                         const index =
                           flightPlan.waypoints.findIndex(
                             wp =>
-                              wp.id ===
-                              contextMenu.waypoint.id
+                              wp.id === contextMenu.waypoint.id
                           )
 
                         if (index >= 0) {
-
                           flightPlan.waypoints.splice(
                             index,
                             1
@@ -346,49 +324,63 @@ export default function FlightPlannerWorkspace() {
                 !contextMenu.waypoint &&
                 !contextMenu.route && (
                   <>
-                    <div className="text-sm">
-                      Lat:{" "}
-                      {contextMenu.lat.toFixed(4)}
+                    {hasRoute && (
+                      <>
+                        <div className="text-sm">
+                          Lat:{" "}
+                          {contextMenu.lat.toFixed(4)}
 
-                      <br />
+                          <br />
 
-                      Lon:{" "}
-                      {contextMenu.lon.toFixed(4)}
-                    </div>
+                          Lon:{" "}
+                          {contextMenu.lon.toFixed(4)}
+                        </div>
 
+                        <button
+                          className="
+                            mt-2
+                            w-full
+                            text-left
+                            px-2
+                            py-1
+                            hover:bg-gray-100
+                          "
+                          onClick={async () => {
+                            const nextWpNumber =
+                              flightPlan.waypoints.filter(
+                                wp => wp.type === "USER"
+                              ).length + 1
+
+                            flightPlan.waypoints.push({
+                              id: crypto.randomUUID(),
+                              name: `WP${nextWpNumber}`,
+                              lat: contextMenu.lat,
+                              lon: contextMenu.lon,
+                              type: "USER"
+                            })
+
+                            await drawFlightPlan(
+                              engine.current!,
+                              false
+                            )
+
+                            setContextMenu(null)
+                          }}
+                        >
+                          Criar waypoint
+                        </button>
+
+                        <hr className="my-1"/>  
+                      </>
+                    )}
+                    
                     <button
-                      className="
-                        mt-2
-                        w-full
-                        text-left
-                        px-2
-                        py-1
-                        hover:bg-gray-100
-                      "
-                      onClick={async () => {
-                        // e => e.stopProgagation()
-                        const nextWpNumber =
-                          flightPlan.waypoints.filter(
-                            wp => wp.type === "USER"
-                          ).length + 1
-
-                        flightPlan.waypoints.push({
-                          id: crypto.randomUUID(),
-                          name: `WP${nextWpNumber}`,
-                          lat: contextMenu.lat,
-                          lon: contextMenu.lon,
-                          type: "USER"
-                        })
-
-                        await drawFlightPlan(
-                          engine.current!,
-                          false
-                        )
-
+                      onClick={() => {
+                        engine.current?.setTool("measure")
                         setContextMenu(null)
                       }}
                     >
-                      Criar waypoint
+                      Medir distância
                     </button>
                   </>
                 )

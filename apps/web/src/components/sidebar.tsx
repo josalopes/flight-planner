@@ -21,7 +21,8 @@ import {
 import { Button } from "@/components/ui/button";
 
 
-import { ChartSelector } from "./chart-selector";
+import { ChartSelector } from "../app/(panel)/_components/chart-selector";
+import { RoutePanel } from "./route-panel";
 
 
 export function SidebarDashboardClient({ children }: { children: React.ReactNode }) {
@@ -58,6 +59,7 @@ export function SidebarDashboardClient({ children }: { children: React.ReactNode
             "
           >
             <ChartSelector />
+            <RoutePanel />
           </div>
           </CollapsibleContent>
         </Collapsible>

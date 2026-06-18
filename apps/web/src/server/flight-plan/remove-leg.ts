@@ -1,4 +1,4 @@
-import { flightPlan } from "./store"
+import { flightPlan, notifyFlightPlanChanged } from "./store"
 
 export function removeLeg(
   legIndex: number
@@ -29,6 +29,8 @@ export function removeLeg(
       0,
       1
     )
+    
+    notifyFlightPlanChanged()
 
     return
   }
@@ -48,6 +50,8 @@ export function removeLeg(
       1
     )
 
+    notifyFlightPlanChanged()
+
     return
   }
 
@@ -60,4 +64,6 @@ export function removeLeg(
     legIndex,
     1
   )
+
+  notifyFlightPlanChanged()
 }

@@ -11,6 +11,7 @@ import { BaseMapLayer } from "../engine/layers/BaseMapLayer"
 import { BASEMAP_EXTENT } from "@/server/flight-plan/types"
 import { useCanvasEngineContext } from "../contexts/canvas-engine-context"
 import { AerodromeHoverLayer } from "../engine/layers/AerodromeHoverLayer"
+import { MeasureTool } from "../engine/tools/MeasureTool"
 
 export function useCanvasEngine() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -65,10 +66,12 @@ export function useCanvasEngine() {
 
     // ===== TOOLS =====
     const distanceTool = new DistanceTool()
+    const measureTool = new MeasureTool()
     const panTool = new PanTool()
     const selectTool = new SelectionTool()
     
     engine.registerTool(distanceTool)
+    engine.registerTool(measureTool)
     engine.registerTool(panTool)
     engine.registerTool(selectTool)
 
