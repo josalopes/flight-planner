@@ -10,12 +10,16 @@ import { ChartManager } from "@/server/aisweb/ChartManager"
 import { worldToLatLon } from "../utils/world-to-latlon"
 import { findNearestAerodrome } from "../utils/find-nearest-aerodrome"
 import { ContextMenuInfo } from "./types/ContextMenu"
-import { findWaypointAtPosition } from "../utils/find-waypoint-at-position"
 import { Aerodrome, BASEMAP_EXTENT, Waypoint } from "@/server/flight-plan/types"
 import { geoToWorld } from "../utils/geo-to-world"
 import { ChartLayer } from "./layers/ChartLayer"
 import { RouteObject } from "./objects/RouteObject"
 import { ObjectLayer } from "./layers/ObjectLayer"
+import { flightPlan } from "@/server/flight-plan/store"
+import { AERODROME_HIT_RADIUS, ROUTE_HIT_RADIUS, WAYPOINT_HIT_RADIUS } from "@/server/flight-plan/flight-planner-config"
+import { findAerodromeAtWorldPosition } from "../utils/find-aerodrome-at-world-position"
+import { GraphicObject } from "./objects/GraphicObject"
+import { WaypointObject } from "./objects/WaypointObject"
 
 export type ToolType =
   | "pan"
@@ -51,11 +55,22 @@ export class CanvasEngine {
   public isShiftPressed = false
   public previousCursor = { x:0, y:0 }
   public hoveredWaypoint: Waypoint | null = null
+  public hoveredWaypointObject: WaypointObject | null = null
   public hoveredAerodrome: Aerodrome | null = null
   public hoveredRoute: RouteObject | null = null
+  public draggedWaypoint: Waypoint | null = null
+  public isDraggingWaypoint = false
   public hasFlightPlan = false
+  public draggedWaypointType:
+  | "USER"
+  | "AERODROME"
+  | "DEPARTURE"
+  | "ARRIVAL"
+  | null = null  
+  
   pendingDeparture: Aerodrome | null = null
-
+  draggedObject: GraphicObject | null = null
+  
   constructor(canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext("2d")
     if (!ctx) throw new Error("Canvas 2D not supported")
@@ -213,10 +228,6 @@ export class CanvasEngine {
     this.canvas.style.cursor =
       tool.cursor ?? "default"
   }
-  // public setTool(id: string) {
-  //   this.activeTool = this.tools.get(id) ?? null
-  //   this.updateCursorStyle()
-  // }
 
   public getPixelsPerUnit() {
     switch (this.unit) {
@@ -370,10 +381,6 @@ export class CanvasEngine {
         100,
         se.y - nw.y
       )
-
-      //
-
-      //
 
     const zoomX =
       (canvas.width - padding * 2)
@@ -530,22 +537,11 @@ export class CanvasEngine {
   }
 
   public getVisibleWorldBounds() {
-    const canvas =
-      this.getCanvas()
-
-    const left =
-      -this.offset.x / this.scale
-
-    const top =
-      -this.offset.y / this.scale
-
-    const right =
-      left +
-      canvas.width / this.scale
-
-    const bottom =
-      top +
-      canvas.height / this.scale
+    const canvas = this.getCanvas()
+    const left = -this.offset.x / this.scale
+    const top = -this.offset.y / this.scale
+    const right = left + canvas.width / this.scale
+    const bottom = top + canvas.height / this.scale
 
     return {
       left,
@@ -720,7 +716,6 @@ export class CanvasEngine {
     )
   }
 
-
   public getChartAtPosition(
     lat: number,
     lon: number
@@ -741,6 +736,33 @@ export class CanvasEngine {
             lon
           )
       )
+  }
+
+  public getWorldFromMouseEvent(
+    event: MouseEvent
+  ) {
+
+    const rect =
+      this.canvas.getBoundingClientRect()
+
+    const scaleX =
+      this.canvas.width / rect.width
+
+    const scaleY =
+      this.canvas.height / rect.height
+
+    const screenX =
+      (event.clientX - rect.left)
+      * scaleX
+
+    const screenY =
+      (event.clientY - rect.top)
+      * scaleY
+
+    return this.screenToWorld(
+      screenX,
+      screenY
+    )
   }
 
   // =========================
@@ -768,9 +790,8 @@ export class CanvasEngine {
     event.preventDefault()
 
     const world =
-      this.screenToWorld(
-        event.offsetX,
-        event.offsetY
+      this.getWorldFromMouseEvent(
+        event
       )
 
     const position =
@@ -795,14 +816,37 @@ export class CanvasEngine {
       return
     }  
 
-    const waypoint =
-      findWaypointAtPosition(
-        position.lat,
-        position.lon,
-        15
-      ) 
+    let hoveredWaypoint = null
 
-    if (waypoint) {
+    const objectLayer =
+      this.getLayer<ObjectLayer>(
+        "objects"
+      )
+
+    if (objectLayer) {
+      for (
+        const wpObject
+        of objectLayer.getWaypointObjects()
+      ) {
+          if (
+            wpObject.hitTest(
+              world,
+              WAYPOINT_HIT_RADIUS / this.scale
+            )
+          ) {
+              hoveredWaypoint =
+                  flightPlan.waypoints.find(
+                    wp =>
+                      wp.id ===
+                      wpObject.waypointId
+                  ) ?? null
+
+                break
+            }
+        }
+    }
+
+    if (hoveredWaypoint) {
       this.onContextMenu?.({
         screenX: event.clientX,
         screenY: event.clientY,
@@ -810,18 +854,18 @@ export class CanvasEngine {
         lat: position.lat,
         lon: position.lon,
 
-        waypoint
+        waypoint: hoveredWaypoint
       })
 
       return
     } 
 
     const airport =
-      findNearestAerodrome(
-        position.lat,
-        position.lon,
-        15
-    ) 
+      findAerodromeAtWorldPosition(
+        world,
+        AERODROME_HIT_RADIUS /
+        this.scale
+      )
 
     if (airport) {
       this.onContextMenu?.({
@@ -881,6 +925,14 @@ export class CanvasEngine {
       this.activeTool.onMouseDown(this, e)
       return
     }
+
+    if (this.hoveredWaypoint) {
+      this.draggedWaypoint = this.hoveredWaypoint
+
+      this.isDraggingWaypoint = true
+
+      return
+    }
     
     // fallback pan
     this.isDragging = true
@@ -905,42 +957,55 @@ export class CanvasEngine {
       this.activeTool.onMouseMove(this, e)
     }
 
-    const world =
-      this.screenToWorld(
-        e.offsetX,
-        e.offsetY
-    )
-
-    const position =
-      worldToLatLon(
-        world.x,
-        world.y
-    )
+    const world = this.getWorldFromMouseEvent(e)
 
     this.hoveredAerodrome =
-      findNearestAerodrome(
-        position.lat,
-        position.lon,
-        8
+      findAerodromeAtWorldPosition(
+        world,
+        AERODROME_HIT_RADIUS /
+        this.scale
       )
 
-    const waypoint =
-      findWaypointAtPosition(
-        position.lat,
-        position.lon
-    )
-
-    if (
-      waypoint !==
-      this.hoveredWaypoint
-    ) {
-      this.hoveredWaypoint = waypoint
-    }
+    let hoveredWaypoint = null
+    let hoveredWaypointObject: WaypointObject | null = null
 
     const objectLayer =
       this.getLayer<ObjectLayer>(
         "objects"
       )
+
+    if (objectLayer) {
+      for (
+        const wpObject
+        of objectLayer.getWaypointObjects()
+      ) {
+        if (
+          wpObject.hitTest(
+            world,
+            WAYPOINT_HIT_RADIUS / this.scale
+          )
+        ) {
+            hoveredWaypointObject = wpObject
+
+            hoveredWaypoint =
+              flightPlan.waypoints.find(
+                wp =>
+                  wp.id ===
+                  wpObject.waypointId
+              ) ?? null
+
+            break
+          }
+      }
+    }
+
+    if (
+      hoveredWaypoint !==
+      this.hoveredWaypoint
+    ) {
+      this.hoveredWaypoint = hoveredWaypoint
+      this.hoveredWaypointObject = hoveredWaypointObject
+    }
 
     this.hoveredRoute = null
 
@@ -953,12 +1018,10 @@ export class CanvasEngine {
         if (
           route.hitTest(
             world,
-            50 / this.scale
+            ROUTE_HIT_RADIUS / this.scale
           )
         ) {
-
-          this.hoveredRoute =
-            route
+          this.hoveredRoute = route
 
           break
         }
@@ -978,14 +1041,10 @@ export class CanvasEngine {
   ) => {
     e.preventDefault()
 
-    const rect =
-      this.canvas.getBoundingClientRect()
+    const rect = this.canvas.getBoundingClientRect()
 
-    const mouseX =
-      e.clientX - rect.left
-
-    const mouseY =
-      e.clientY - rect.top
+    const mouseX = e.clientX - rect.left
+    const mouseY = e.clientY - rect.top
 
     const worldBefore =
       this.screenToWorld(

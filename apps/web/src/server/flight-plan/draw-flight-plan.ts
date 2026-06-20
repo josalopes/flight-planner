@@ -210,6 +210,25 @@ export async function drawFlightPlan(
       )
     }
 
+// ======================
+// DEPARTURE
+// ======================
+
+const departureWorld =
+  latLonToWorld(
+    flightPlan.departure.lat,
+    flightPlan.departure.lon
+  )
+
+  objectLayer.add(
+    new WaypointObject(
+      departureWorld,
+      "DEP",
+      "DEPARTURE",
+      "departure"
+    )
+  )
+
     for (
       const waypoint
       of flightPlan.waypoints
@@ -231,6 +250,25 @@ export async function drawFlightPlan(
         )
       )
     }
+
+    // ======================
+    // ARRIVAL
+    // ======================
+
+    const arrivalWorld =
+      latLonToWorld(
+        flightPlan.arrival.lat,
+        flightPlan.arrival.lon
+      )
+
+    objectLayer.add(
+      new WaypointObject(
+        arrivalWorld,
+        "ARR",
+        "ARRIVAL",
+        "arrival"
+      )
+    )
 
   engine.render() 
          

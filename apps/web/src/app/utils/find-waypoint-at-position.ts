@@ -1,11 +1,12 @@
 import { flightPlan } from "@/server/flight-plan/store"
 import { haversineNm } from "./get-distance"
+import { Waypoint } from "@/server/flight-plan/types"
 
 export function findWaypointAtPosition(
   lat: number,
   lon: number,
   maxDistanceNm = 5
-) {
+): Waypoint | null {
 
   let nearest = null
   let minDistance = Infinity

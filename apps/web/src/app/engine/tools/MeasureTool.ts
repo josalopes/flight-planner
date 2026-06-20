@@ -26,11 +26,8 @@ export class MeasureTool
     engine: CanvasEngine,
     e: MouseEvent
   ) {
-    const world =
-      engine.screenToWorld(
-        e.offsetX,
-        e.offsetY
-      )
+    const world = engine.getWorldFromMouseEvent(e)
+
 
     // Primeiro clique
 

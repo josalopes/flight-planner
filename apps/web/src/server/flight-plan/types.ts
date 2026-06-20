@@ -25,16 +25,6 @@ export interface FlightPlan {
   arrival: Aerodrome | null
   waypoints: Waypoint[]
 }
-
-// export interface ContextMenuInfo {
-//   screenX: number
-//   screenY: number
-//   lat: number
-//   lon: number
-//   airport?: Aerodrome
-//   waypoint?: Waypoint
-// }
-
 export interface FlightLeg {
   origin: Aerodrome
   destination: Aerodrome
@@ -49,5 +39,6 @@ export const BASEMAP_EXTENT = {
   east: -15.288304326921406,
   north: 13.892226934561162
 }
+
 
 export const CHART_ZOOM_THRESHOLD = 0.10

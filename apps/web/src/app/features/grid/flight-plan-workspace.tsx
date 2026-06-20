@@ -8,8 +8,6 @@ import { testRoute1 } from "@/app/utils/test-route1"
 import { flightPlan, notifyFlightPlanChanged } from "@/server/flight-plan/store"
 import { drawFlightPlan } from "@/server/flight-plan/draw-flight-plan"
 import { ObjectLayer } from "@/app/engine/layers/ObjectLayer"
-import { latLonToWorld } from "@/app/utils/latlon-to-world"
-import { WaypointObject } from "@/app/engine/objects/WaypointObject"
 import { removeLeg } from "@/server/flight-plan/remove-leg"
 import { clearFlightPlan } from "@/server/flight-plan/clear-flight-plan"
 
@@ -57,22 +55,6 @@ export default function FlightPlannerWorkspace() {
                 )
 
             if (objectLayer) {
-
-              const world =
-                latLonToWorld(
-                  info.airport.lat,
-                  info.airport.lon
-                )
-
-              objectLayer.add(
-                new WaypointObject(
-                  world,
-                  "DEP",
-                  "DEPARTURE",
-                  "departure"
-                )
-              )
-
               engine.current!.render()
             }
 
