@@ -4,59 +4,44 @@ import aerodromes
 import { CanvasLayer } from "../types/CanvasLayer"
 import { CanvasEngine } from "../CanvasEngine"
 import { latLonToWorld } from "@/app/utils/latlon-to-world"
+import { REGIONS } from "@/app/constants/regions"
 
-const capitals = [
-  "Goiânia",
-  "Cuiabá",
-  "Campo Grande",
-  "Brasília",
-  "Maceió",
-  "Salvador",
-  "Fortaleza",
-  "São Luís",
-  "João Pessoa",
-  "Recife",
-  "Teresina",
-  "Aracaju",
-  "Rio Branco",
-  "Macapá",
-  "Manaus",
-  "Belém",
-  "Porto Velho",
-  "Boa Vista",
-  "Palmas",
-  "Vitória",
-  "Belo Horizonte",
-  "Rio de Janeiro",
-  "São Paulo",
-  "Curitiba",
-  "Porto Alegre",
-  "Florianópolis",
-  ]
 
 export class AerodromeLayer
   implements CanvasLayer {
-
   id = "aerodromes"
-
   visible = true
-
-  
 
   draw(
     ctx: CanvasRenderingContext2D,
     engine: CanvasEngine
   ) {
 
-    const visibleAirports =
-      engine.scale < 0.03
-        ? aerodromes.filter(
-            airport =>
-              capitals.includes(
-                airport.city
-              )
-          )
-        : aerodromes  
+    let visibleAirports =
+      [...aerodromes]
+
+    const region =
+      engine.aerodromeFilter.region
+
+    if (region &&
+      region !== "Todas") {
+
+      const states =
+        REGIONS[
+          region as keyof typeof REGIONS
+        ]
+
+      visibleAirports =
+        visibleAirports.filter(
+          airport =>
+            states.includes(
+              airport.uf
+            )
+        )
+    }
+
+    engine.visibleAerodromesCount =
+      visibleAirports.length
 
     const radius =
       3 / engine.scale
@@ -124,23 +109,21 @@ export class AerodromeLayer
     if (
       engine.scale > 0.60
     ) {
+        ctx.fillStyle = "#444"
+        ctx.font =
+          `${7 / engine.scale}px sans-serif`
 
-      ctx.fillStyle = "#444"
-
-      ctx.font =
-        `${7 / engine.scale}px sans-serif`
-
-      ctx.fillText(
-        airport.city,
-        world.x +
-          radius * 2,
-        world.y +
-          35 / engine.scale
-      )
-
-      ctx.fillStyle =
-        "#1d4ed8"
-    }  
-      }
+        ctx.fillText(
+          airport.name,
+          world.x +
+            radius * 2,
+          world.y +
+            35 / engine.scale
+        )
+          
+        ctx.fillStyle =
+          "#1d4ed8"
+      }  
+    }
   }
 }

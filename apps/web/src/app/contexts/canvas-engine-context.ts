@@ -9,7 +9,6 @@ import { CanvasEngine }
 from "@/app/engine/CanvasEngine"
 
 interface CanvasEngineContextData {
-
   engine:
     CanvasEngine | null
 

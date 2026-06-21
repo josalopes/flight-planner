@@ -10,7 +10,7 @@ export function CanvasViewer({
       ref={canvasRef}
       className="
         w-full
-        h-[calc(100vh-20px)]
+        h-full
         border
         bg-white
         shadow

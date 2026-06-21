@@ -20,12 +20,19 @@ export function CanvasEngineProvider({
   children
 }: Props) {
 
+  const [tick, setTick] = useState(0)
+
   const [
     engine,
     setEngine
   ] = useState<
     CanvasEngine | null
   >(null)
+
+  const refreshCanvasStatus =
+    () => setTick(
+      value => value + 1
+    )
 
   return (
 

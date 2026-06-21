@@ -13,7 +13,17 @@ import {
   ChevronRight
 } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
+
+import { Button }
+  from "@/components/ui/button"
+
+// import { Button } from "@/components/ui/button"
 
 import { flightPlan, notifyFlightPlanChanged, subscribeFlightPlan } from "@/server/flight-plan/store"
 import { clearFlightPlan } from "@/server/flight-plan/clear-flight-plan"
@@ -62,7 +72,7 @@ export function RoutePanel() {
   return (
     <>    
       <Collapsible
-        open={open}
+        open={false}
         onOpenChange={setOpen}
       >
         <CollapsibleTrigger
@@ -89,6 +99,7 @@ export function RoutePanel() {
         </CollapsibleTrigger>
 
         <CollapsibleContent>
+
           <div className="flex flex-col gap-2 mt-2">
             <div className="text-sm">
               <div>

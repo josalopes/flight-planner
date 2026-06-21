@@ -66,7 +66,13 @@ export class CanvasEngine {
   | "AERODROME"
   | "DEPARTURE"
   | "ARRIVAL"
-  | null = null  
+  | null = null 
+
+  public aerodromeFilter = {
+    region: "Todas"
+  }
+
+  public visibleAerodromesCount = 0
   
   pendingDeparture: Aerodrome | null = null
   draggedObject: GraphicObject | null = null

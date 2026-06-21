@@ -136,16 +136,8 @@ export default function FlightPlannerWorkspace() {
 
   }, [])
 
-  async function handleLoadMap() {
-    if (!engine.current) return
-    // const url = "https://aisweb.decea.mil.br/cartas/visuais/wac/salvador_wac_20240808.pdf"
-
-    // await loadPDFIntoEngine(url, engine.current)
-    await testRoute1(engine.current)
-  }
-
   return (
-    <div className="h-screen overflow-hidden">
+    <div className="h-full overflow-hidden">
       <div className="w-full h-full relative">
         <CanvasViewer
           canvasRef={canvasRef}

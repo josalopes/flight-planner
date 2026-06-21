@@ -23,10 +23,33 @@ import { Button } from "@/components/ui/button";
 
 import { ChartSelector } from "../app/(panel)/_components/chart-selector";
 import { RoutePanel } from "./route-panel";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { useCanvasEngineContext } from "@/app/contexts/canvas-engine-context";
+import { StatusBar } from "@/app/components/Canvas/StatusBar";
 
 
 export function SidebarDashboardClient({ children }: { children: React.ReactNode }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const { engine } = useCanvasEngineContext()
+  const [
+    selectedRegion,
+    setSelectedRegion
+  ] = useState("Todas")
+
+  const setRegion =
+    (region: string) => {
+      if (!engine) {
+        return
+      }
+
+      engine.aerodromeFilter.region =
+        region
+
+      setSelectedRegion(region)  
+
+      engine.render()
+    }
+
 
   return (
     <div className="flex min-h-screen w-full">
@@ -59,6 +82,72 @@ export function SidebarDashboardClient({ children }: { children: React.ReactNode
             "
           >
             <ChartSelector />
+
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                asChild
+              >
+                <Button
+                  variant="outline"
+                  size="sm"
+                >
+                  Região:
+                  {" "}
+                  {selectedRegion}
+                </Button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent>
+                <DropdownMenuItem
+                  onClick={() =>
+                    setRegion("Todas")
+                  }
+                >
+                  Todas
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={() =>
+                    setRegion("Norte")
+                  }
+                >
+                  Norte
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={() =>
+                    setRegion("Nordeste")
+                  }
+                >
+                  Nordeste
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={() =>
+                    setRegion("Centro-Oeste")
+                  }
+                >
+                  Centro-Oeste
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={() =>
+                    setRegion("Sudeste")
+                  }
+                >
+                  Sudeste
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={() =>
+                    setRegion("Sul")
+                  }
+                >
+                  Sul
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <RoutePanel />
           </div>
           </CollapsibleContent>
@@ -91,9 +180,10 @@ export function SidebarDashboardClient({ children }: { children: React.ReactNode
           </Sheet> 
         </header>
 
-        <main className="flex-1 py-4 px-2 md:p-6">
+        <main className="flex-1 min-h-0 p-0">
             {children}
         </main>
+        <StatusBar />
       </div>
     </div>
   )
