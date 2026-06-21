@@ -12,6 +12,7 @@ import { BASEMAP_EXTENT } from "@/server/flight-plan/types"
 import { useCanvasEngineContext } from "../contexts/canvas-engine-context"
 import { AerodromeHoverLayer } from "../engine/layers/AerodromeHoverLayer"
 import { MeasureTool } from "../engine/tools/MeasureTool"
+import { AerodromeLayer } from "../engine/layers/AerodromeLayer"
 
 export function useCanvasEngine() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -56,8 +57,10 @@ export function useCanvasEngine() {
     const objectLayer = new ObjectLayer()
     const crosshairLayer = new CrosshairLayer()
     const hudLayer = new HudLayer()
+    const aerodromeLayer = new AerodromeLayer()
 
     engine.addLayerAt(0, baseMapLayer)
+    engine.addLayer(aerodromeLayer)
     engine.addLayer(imageLayer)
     engine.addLayer(objectLayer)
     engine.addLayer(crosshairLayer)

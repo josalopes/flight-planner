@@ -20,11 +20,17 @@ import { clearFlightPlan } from "@/server/flight-plan/clear-flight-plan"
 import { drawFlightPlan } from "@/server/flight-plan/draw-flight-plan"
 
 import { useCanvasEngineContext } from "@/app/contexts/canvas-engine-context"
+import { RouteDirectDialog } from "./route-direct-dialog"
+import { createDirectRoute } from "@/server/flight-plan/create-direct-route"
 
 export function RoutePanel() {
   const [open, setOpen] = useState(true)
   const { engine } = useCanvasEngineContext()
   const [, setRefresh] = useState(0)
+  const [
+    directRouteOpen,
+    setDirectRouteOpen
+  ] = useState(false)
 
   const hasRoute =
     !!flightPlan.departure &&
@@ -46,7 +52,6 @@ export function RoutePanel() {
       return
 
     clearFlightPlan()
-    // notifyFlightPlanChanged()
 
     await drawFlightPlan(
       engine,
@@ -55,80 +60,119 @@ export function RoutePanel() {
   }
 
   return (
-    <Collapsible
-      open={open}
-      onOpenChange={setOpen}
-    >
-      <CollapsibleTrigger
-        className="
-          flex
-          items-center
-          justify-between
-          w-full
-          px-2
-          py-2
-          rounded-md
-          hover:bg-accent
-        "
+    <>    
+      <Collapsible
+        open={open}
+        onOpenChange={setOpen}
       >
-        <span>
-          Rota
-        </span>
+        <CollapsibleTrigger
+          className="
+            flex
+            items-center
+            justify-between
+            w-full
+            px-2
+            py-2
+            rounded-md
+            hover:bg-accent
+          "
+        >
+          <span>
+            Rota
+          </span>
 
-        {
-          open
-            ? <ChevronDown className="w-4 h-4" />
-            : <ChevronRight className="w-4 h-4" />
-        }
-      </CollapsibleTrigger>
+          {
+            open
+              ? <ChevronDown className="w-4 h-4" />
+              : <ChevronRight className="w-4 h-4" />
+          }
+        </CollapsibleTrigger>
 
-      <CollapsibleContent>
-        <div className="flex flex-col gap-2 mt-2">
-          <div className="text-sm">
-            <div>
-              Departure:
-              {" "}
-              {
-                flightPlan.departure?.icao ??
-                ""
-              }
+        <CollapsibleContent>
+          <div className="flex flex-col gap-2 mt-2">
+            <div className="text-sm">
+              <div>
+                Departure:
+                {" "}
+                {
+                  flightPlan.departure?.icao ??
+                  ""
+                }
+              </div>
+
+              <div>
+                Arrival:
+                {" "}
+                {
+                  flightPlan.arrival?.icao ??
+                  ""
+                }
+              </div>
+
+              <div>
+                Waypoints:
+                {" "}
+                {
+                  flightPlan.waypoints.length
+                }
+              </div>
+
             </div>
 
-            <div>
-              Arrival:
-              {" "}
-              {
-                flightPlan.arrival?.icao ??
-                ""
-              }
-            </div>
+            <Button
+              variant="outline"
+              disabled={!hasRoute}
+            >
+              Nova rota
+            </Button>
 
-            <div>
-              Waypoints:
-              {" "}
-              {
-                flightPlan.waypoints.length
+            <Button
+              onClick={() =>
+                setDirectRouteOpen(true)
               }
-            </div>
+            >
+              Rota direta
+            </Button>
 
+            <Button
+              variant="destructive"
+              disabled={!hasRoute}
+              onClick={handleClearRoute}
+            >
+              Remover rota
+            </Button>
           </div>
+        </CollapsibleContent>
+      </Collapsible>
 
-          <Button
-            variant="outline"
-            disabled={!hasRoute}
-          >
-            Nova rota
-          </Button>
+      <RouteDirectDialog
+        open={directRouteOpen}
+        onOpenChange={open => {
 
-          <Button
-            variant="destructive"
-            disabled={!hasRoute}
-            onClick={handleClearRoute}
-          >
-            Remover rota
-          </Button>
-        </div>
-      </CollapsibleContent>
-    </Collapsible>
-  )
+          if (!open) {
+            engine?.setTool(
+              "pan"
+            )
+          }
+      
+          setDirectRouteOpen(open)
+      
+        }}
+        onCreate={async (
+          departure,
+          arrival
+        ) => {  
+          if (!engine) 
+            return
+
+          await createDirectRoute(
+            engine,
+            departure,
+            arrival
+          )
+        }}
+      />
+    </>
+
+    )
 }

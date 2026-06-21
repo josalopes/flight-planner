@@ -46,22 +46,31 @@ export class AerodromeHoverLayer
   ctx.fillStyle =
     "#0080ff"
 
-  ctx.textAlign =
-    "left"
+  ctx.textAlign = "left"
+  ctx.textBaseline = "top"
 
-  ctx.textBaseline =
-    "middle"
+  const textX =
+  world.x +
+  size +
+  4 / engine.scale
+
+  const textY =
+    world.y - size
 
   ctx.fillText(
     airport.icao,
-    world.x + size + 4 / engine.scale,
-    world.y
-  )  
-  // ctx.fillText(
-  //   airport.icao,
-  //   world.x,
-  //   world.y - size - 4 / engine.scale
-  // )
+    textX,
+    textY
+  )
+
+  ctx.font =
+  `${10 / engine.scale}px Arial`
+
+  ctx.fillText(
+    airport.city,
+    textX,
+    textY + 12 / engine.scale
+  )
 
   ctx.restore()
 }

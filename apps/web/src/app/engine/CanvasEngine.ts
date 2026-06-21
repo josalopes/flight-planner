@@ -1059,6 +1059,13 @@ export class CanvasEngine {
 
     this.scale *= factor
 
+    //
+    console.log(
+      "ZOOM",
+      this.scale
+    )
+    //
+
     const worldAfter =
       this.screenToWorld(
         mouseX,
